@@ -41,5 +41,7 @@ This is the website repository for our graduation project at **Yaşar University
 ## 🎓 Project
 
 COMP4910 Senior Design Project
+
 Yaşar University - Computer Engineering Department
+
 © 2026 AuraTwin
