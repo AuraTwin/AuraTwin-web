@@ -31,10 +31,10 @@ This is the website repository for our graduation project at **Yaşar University
 
 ## 👥 Team
 
-- Yiğit Emre Çay
 - Ali Haktan Sığın
-- Utku Derici
+- Yiğit Emre Çay
 - Ahmet Özgür Korkmaz
+- Utku Derici
 
 **Academic Advisor**: Doç. Dr. Mete Eminağaoğlu
 
