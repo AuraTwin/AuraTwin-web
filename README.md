@@ -33,8 +33,8 @@ This is the website repository for our graduation project at **Yaşar University
 
 - Ali Haktan SIĞIN – 21070001004
 - Yiğit Emre ÇAY – 21070001008
-- Ahmet Özgür KORKMAZ – 21070001046
 - Utku DERİCİ – 21070001031
+- Ahmet Özgür KORKMAZ – 21070001046
 
 **Academic Advisor**: Doç. Dr. Mete Eminağaoğlu
 
