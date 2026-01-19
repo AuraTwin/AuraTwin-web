@@ -1,6 +1,6 @@
 # AuraTwin Website 🧠✨
 
-> Official website for AuraTwin - An Affective Digital Twin for Personalized Well-being and Self-Correction
+Official website for AuraTwin - An Affective Digital Twin for Personalized Well-being and Self-Correction
 
 🌐 **Live Demo**: [https://auratwin.netlify.app/](https://auratwin.netlify.app/)
 
