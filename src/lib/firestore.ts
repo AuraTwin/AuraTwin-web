@@ -9,7 +9,12 @@ import {
   setDoc,
   Timestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db as _db } from './firebase';
+import type { Firestore } from 'firebase/firestore';
+
+// These helpers are only called from authenticated client-side code,
+// so db is always initialized by the time they run.
+const db = _db as Firestore;
 
 export interface EmotionLog {
   timestamp: Timestamp;

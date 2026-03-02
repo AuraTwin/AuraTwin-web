@@ -21,6 +21,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // auth is null when Firebase env vars are not configured (e.g. CI build)
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
@@ -29,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await signOut(auth);
+    if (auth) await signOut(auth);
   };
 
   return (
