@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,7 +11,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg"></div>
+              <Image src="/logo_circle.png" alt="AuraTwin" width={32} height={32} />
               <span className="text-xl font-bold text-white">AuraTwin</span>
             </div>
             <p className="text-sm text-gray-400">
@@ -35,11 +36,6 @@ export default function Footer() {
               <li>
                 <Link href="/science" className="text-sm hover:text-white transition-colors">
                   Science & Research
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="text-sm hover:text-white transition-colors">
-                  Pricing
                 </Link>
               </li>
             </ul>
@@ -85,11 +81,6 @@ export default function Footer() {
                 <Link href="/terms" className="text-sm hover:text-white transition-colors">
                   Terms of Service
                 </Link>
-              </li>
-              <li>
-                <a href="mailto:contact@auratwin.com" className="text-sm hover:text-white transition-colors">
-                  Contact
-                </a>
               </li>
             </ul>
           </div>

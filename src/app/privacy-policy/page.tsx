@@ -37,10 +37,7 @@ export default function PrivacyPolicyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Contact</h2>
             <p className="text-gray-700">
-              For privacy-related questions or concerns, please contact us at:{' '}
-              <a href="mailto:privacy@auratwin.com" className="text-primary-600 hover:underline">
-                privacy@auratwin.com
-              </a>
+              For privacy-related questions or concerns, please contact the AuraTwin team.
             </p>
           </section>
 

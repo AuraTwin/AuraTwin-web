@@ -185,22 +185,26 @@ export default function ProductPage() {
             <div className="bg-gradient-to-br from-accent-50 to-white p-8 rounded-2xl border border-accent-100">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Hybrid Architecture</h3>
               <p className="text-gray-600 mb-4">
-                AuraTwin uses a hybrid client-server model that balances performance with privacy. Processing happens in the cloud, but your data stays under your control.
+                AuraTwin uses a four-tier hybrid architecture: a Python desktop client captures and analyses emotions, an AWS FastAPI server handles processing, Firebase Firestore persists your data, and the web dashboard visualises insights with Gemini AI.
               </p>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <span className="text-accent-600 mr-2">•</span>
-                  <span className="text-gray-700">Lightweight desktop client</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-accent-600 mr-2">•</span>
-                  <span className="text-gray-700">Secure cloud processing</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-accent-600 mr-2">•</span>
-                  <span className="text-gray-700">Local encrypted data storage</span>
-                </li>
-              </ul>
+              <div className="space-y-3 mb-4">
+                {[
+                  { step: '1', label: 'Windows Client', desc: 'Python desktop app captures facial expressions via webcam and sends emotion data to the server using your App Key.' },
+                  { step: '2', label: 'AWS FastAPI Server', desc: 'Validates the App Key, runs the Mini-Xception model, and writes the result to Firestore.' },
+                  { step: '3', label: 'Firebase Firestore', desc: 'Stores emotion logs securely in the cloud, linked to your account.' },
+                  { step: '4', label: 'Web Dashboard + Gemini AI', desc: 'Displays charts, stats, and AI-generated well-being reports powered by Gemini 2.0 Flash.' },
+                ].map((item) => (
+                  <div key={item.step} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-accent-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      {item.step}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-gray-900">{item.label}</span>
+                      <span className="text-gray-600"> — {item.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -299,7 +303,7 @@ export default function ProductPage() {
             Join our beta program and start your journey to better emotional awareness.
           </p>
           <Link
-            href="/pricing"
+            href="/login"
             className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
           >
             Get Early Access

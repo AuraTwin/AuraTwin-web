@@ -137,3 +137,11 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Local project documents
+teknik_dokuman.txt
+
+# Source asset files (processed copies live in public/)
+AuraTwin_logo.png
+AuraTwin_logo_circle.png
+favicon_set_auratwin/

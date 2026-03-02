@@ -19,10 +19,10 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/pricing"
+                href="/login"
                 className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-all transform hover:scale-105 shadow-lg"
               >
-                Join the Waitlist
+                Get Started Free
               </Link>
               <Link
                 href="/product"
@@ -135,7 +135,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 text-center">Download & Install</h3>
                 <p className="text-gray-600 text-center">
-                  Install the lightweight AuraTwin desktop client on your Windows computer. Setup takes less than 2 minutes.
+                  Download and install the AuraTwin Windows desktop client. Enter your App Key from the dashboard to link your account — setup takes less than 2 minutes.
                 </p>
               </div>
             </div>
@@ -263,10 +263,10 @@ export default function Home() {
             Join our beta program and be among the first to experience personalized emotional intelligence.
           </p>
           <Link
-            href="/pricing"
+            href="/login"
             className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-all transform hover:scale-105 shadow-lg"
           >
-            Join the Waitlist
+            Create Free Account
           </Link>
           <p className="mt-4 text-sm text-gray-500">
             No credit card required. Early access launching Q2 2026.

@@ -308,7 +308,7 @@ export default function SciencePage() {
             Join our beta program and be part of the future of emotional well-being.
           </p>
           <a
-            href="/pricing"
+            href="/login"
             className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
           >
             Get Early Access

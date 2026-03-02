@@ -314,12 +314,6 @@ export default function PrivacyPage() {
             >
               Read Full Privacy Policy
             </a>
-            <a
-              href="mailto:privacy@auratwin.com"
-              className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white text-lg font-semibold rounded-lg hover:bg-white hover:text-primary-600 transition-all"
-            >
-              Contact Privacy Team
-            </a>
           </div>
         </div>
       </section>

@@ -107,7 +107,7 @@ export default function AboutPage() {
                 Yaşar University - Computer Engineering Department
               </p>
               <p className="text-gray-600">
-                Supervised the development of AuraTwin as the COMP4910 Senior Design Project, ensuring academic rigor and adherence to research standards throughout the development process.
+                Supervised the development of AuraTwin as the COMP4920 Senior Design Project, ensuring academic rigor and adherence to research standards throughout the development process.
               </p>
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function AboutPage() {
 
           <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl border border-gray-200">
             <p className="text-gray-700 mb-6">
-              AuraTwin was developed as a capstone senior design project (COMP4910) at Yaşar University's Computer Engineering Department in Izmir, Turkey. The project represents the culmination of four years of computer science education, combining theoretical knowledge with practical application.
+              AuraTwin was developed as a capstone senior design project (COMP4920) at Yaşar University's Computer Engineering Department in Izmir, Turkey. The project represents the culmination of four years of computer science education, combining theoretical knowledge with practical application.
             </p>
             <p className="text-gray-700 mb-6">
               The development process followed professional software engineering standards, including comprehensive requirements specification, detailed design documentation, systematic testing, and rigorous project management.
@@ -249,10 +249,10 @@ export default function AboutPage() {
             Be part of the future of emotional well-being and self-awareness.
           </p>
           <a
-            href="/pricing"
+            href="/login"
             className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
           >
-            Join the Waitlist
+            Create an Account
           </a>
         </div>
       </section>

@@ -123,7 +123,7 @@ export default function FAQPage() {
         },
         {
           q: 'When will AuraTwin launch?',
-          a: 'We\'re targeting Q2 2026 for early access. Join our waitlist to be notified when we launch.'
+          a: 'We\'re targeting Q2 2026 for early access. Create an account to be notified when we launch.'
         },
         {
           q: 'Is there a free trial?',
@@ -244,16 +244,10 @@ export default function FAQPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:support@auratwin.com"
+              href="/login"
               className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-colors"
             >
-              Email Support
-            </a>
-            <a
-              href="/pricing"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-colors border-2 border-primary-600"
-            >
-              Join Waitlist
+              Get Started
             </a>
           </div>
         </div>
