@@ -117,6 +117,8 @@ OpenCV (cv2): Kamera erişimi ve fotoğraf çekimi için.
 PyQt5 / CustomTkinter: Sade ve modern bir kullanıcı arayüzü (GUI) için.
 Pystray: Uygulamanın sağ alt köşede (System Tray) çalışmasını sağlamak için.
 Requests: AWS API'sine güvenli veri gönderimi için.
+firebase (google-cloud-firestore veya firebase-admin): Firestore'a doğrudan bağlantı için.
+
 3.2. Çalışma Mekanizması (Sessiz Çalışma):
 Background Mode: Uygulama açıldığında ana pencere kapatılsa bile sağ alt köşede
 (saat yanında) AuraTwin logosuyla çalışmaya devam eder.
@@ -124,11 +126,21 @@ Zamanlayıcı (Timer): Kullanıcı tarafından belirlenen (varsayılan: 5 dakika
 "kamera tetikleme" sinyali gönderilir.
 Capture & Release: Kamera sadece fotoğrafın çekildiği o milisaniyede açılır ve kare
 alınır alınmaz hemen serbest bırakılır. Bu sayede kamera sürekli meşgul edilmez.
-3.3. Hesap Eşleşmesi (Token Login):
-Kullanıcı uygulamayı ilk kurduğunda Web Panel'den (Bölüm 2) aldığı kendine özel
-App Key'i girer.
-Uygulama bu anahtarı yerel bir yapılandırma dosyasında saklar ve her gönderimde
-AWS'ye "Ben şu anahtara sahip kullanıcıyım" bilgisini iletir.
+
+3.3. Hesap Eşleşmesi (App Key Login):
+Kullanıcı uygulamayı ilk kurduğunda Web Dashboard'dan aldığı App Key'i girer.
+Uygulama bu anahtarı yerel bir yapılandırma dosyasında saklar.
+
+Giriş doğrulama akışı (Client → Firestore direkt):
+  1. Client, girilen app_key ile Firestore'daki app_keys/{app_key} dokümanını okur.
+  2. Doküman yoksa → "Geçersiz App Key" hatası gösterilir.
+  3. Doküman varsa → uid alanı alınır.
+  4. Client, users/{uid}/profile/data dokümanını okur → name ve surname çeker.
+  5. Kullanıcıya "Hoş geldin, Ali Yılmaz!" mesajı gösterilir.
+  6. uid ve app_key yerel config dosyasına kaydedilir.
+
+Not: Client, Firestore'a yalnızca bu doğrulama adımında OKUMA yapar.
+     Firestore'a hiçbir zaman YAZMA yapmaz; yazma işlemi AWS'ye aittir.
 3.4. Güvenlik ve Gizlilik (Edge Processing):
 Disk Kaydı Yok: Çekilen fotoğraf asla bilgisayarın hard diskine kaydedilmez. Görsel
 doğrudan RAM üzerinden şifrelenerek (base64 formatında) AWS'ye post edilir.
@@ -212,13 +224,13 @@ users/{uid}/last_report/data
 
 Koleksiyon / Belge             | Web (Next.js) | AWS (Admin SDK) | Client (Python)
 -------------------------------|---------------|-----------------|----------------
-app_keys/{app_key}             | YAZAR         | OKUR            | -
-users/{uid}/profile/data       | YAZAR, OKUR   | -               | -
+app_keys/{app_key}             | YAZAR         | OKUR            | OKUR (giriş doğrulama)
+users/{uid}/profile/data       | YAZAR, OKUR   | -               | OKUR (isim çekme)
 users/{uid}/emotions/{autoId}  | OKUR          | YAZAR           | -
 users/{uid}/last_report/data   | YAZAR, OKUR   | -               | -
 
-Client (Python masaüstü uygulaması) Firestore'a hiç bağlanmaz.
-Yalnızca AWS API'sine istek gönderir; Firestore işlemleri AWS tarafından yapılır.
+Client (Python masaüstü uygulaması) Firestore'a yalnızca OKUMA yapar (giriş anında).
+Duygu verisi YAZMA işlemi tamamen AWS'ye aittir; Client asla Firestore'a yazmaz.
 
 5.3. AWS İstek Akışı (Client → AWS → Firestore)
 
