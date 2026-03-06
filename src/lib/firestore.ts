@@ -70,3 +70,15 @@ export async function getLastReport(uid: string): Promise<WellbeingReport | null
   return snap.exists() ? (snap.data() as WellbeingReport) : null;
 }
 
+/*
+ * Firestore Structure
+ * ───────────────────
+ * app_keys/{app_key}               → { uid, created_at }          (AWS lookup)
+ *
+ * users/{uid}/
+ *   profile/data                   → { name, surname, email, app_key, created_at }
+ *   last_report/data               → { generated_at, content }
+ *   emotions/{autoId}              → { timestamp, emotion_label, confidence }
+ *                                     ↑ written by AWS via Firebase Admin SDK
+ */
+

@@ -38,12 +38,21 @@ export default function RegisterPage() {
       const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
       await updateProfile(user, { displayName: form.name });
       const app_key = generateAppKey();
+      const now = Timestamp.now();
+
+      // User profile
       await setDoc(doc(db, 'users', user.uid, 'profile', 'data'), {
         name: form.name,
         surname: form.surname,
         email: form.email,
         app_key,
-        created_at: Timestamp.now(),
+        created_at: now,
+      });
+
+      // Reverse lookup: app_key → uid (AWS uses this for O(1) user resolution)
+      await setDoc(doc(db, 'app_keys', app_key), {
+        uid: user.uid,
+        created_at: now,
       });
       router.push('/dashboard');
     } catch (err: unknown) {

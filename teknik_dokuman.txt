@@ -1,0 +1,247 @@
+📄 AuraTwin Teknik Uygulama Dökümanı (V1.0)
+İÇİNDEKİLER:
+🧩 Bölüm 1: Backend Mimari ve AI Motoru (AWS & AI)
+Sistemin beyni; AWS EC2 kurulumu, FastAPI altyapısı ve Mini-Xception modelinin
+entegrasyonu.
+🌐 Bölüm 2: Web Kontrol Paneli ve Veri Yönetimi (Firebase & Web)
+Sistemin vitrini; Kullanıcı girişi, Token eşleşme mekanizması ve duygusal grafiklerin
+görselleştirilmesi.
+💻 Bölüm 3: Windows İstemci Uygulaması (Desktop App)
+Sistemin sensörü; Arka planda sessizce çalışan, kamera erişimi sağlayan ve veri
+gönderen Python uygulaması.
+🧠 Bölüm 4: Dijital İkiz ve Akıllı Analiz (Gemini AI)
+Sistemin zekası; Toplanan verilerin Gemini API ile anlamlandırılması, haftalık
+raporlama ve kişisel öneri motoru.
+🧩 Bölüm 1: Backend Mimari ve AI Motoru (AWS & AI)
+Bu bölüm, sistemin işlem gücünü sağlayan, gelen veriyi analiz eden ve diğer tüm
+parçaları (Client, Web, AI) birbirine bağlayan merkez üssüdür.
+1.1. Altyapı (Hosting):
+Platform: AWS EC2 (Elastic Compute Cloud).
+Sunucu Tipi: t2.micro veya t3.micro (AWS Free Tier kapsamında 0 TL maliyet).
+İşletim Sistemi: Ubuntu Server.
+Web Server: Gunicorn ve Nginx (Hızlı ve güvenli API yönetimi için).
+1.2. API Katmanı (İletişim):
+Framework: FastAPI (Python tabanlı).
+Neden? Flask'tan daha hızlıdır ve dokümantasyonu otomatiktir. Client'tan gelen
+fotoğrafları karşılamak için /predict-emotion gibi endpoint'ler barındırır.
+Güvenlik: Firebase Admin SDK entegrasyonu ile gelen her isteğin "Token"
+doğrulaması burada yapılır.
+1.3. Duygu Tanıma Motoru (ML Model):
+Model: Mini-Xception (CNN mimarisi).
+Çalışma Prensibi: 1. Client'tan gelen base64 formatındaki görsel RAM'e alınır. 2.
+Model, görseldeki yüzü bulur ve 7 temel duygu (Happy, Sad, Angry, vb.) skorunu
+üretir. 3. Gizlilik: Analiz bittiği an görsel RAM'den temizlenir. Sunucuda hiçbir görsel
+dosya olarak kaydedilmez.
+1.4. Firebase Entegrasyonu:
+Analiz sonucu (Duygu etiketi, güven skoru, timestamp), Python kodu içinden
+doğrudan Firebase Firestore'a ilgili kullanıcının altına yazılır.
+Mini-Xception, özellikle kısıtlı donanımlara sahip cihazlarda (mobil veya düşük
+konfigürasyonlu sunucular) gerçek zamanlı yüz ifadesi tanıma (FER) yapmak için
+optimize edilmiş, oldukça hafif bir Evrişimli Sinir Ağı (CNN) mimarisidir.
+AuraTwin projesinde bu modeli seçmemizin ana nedeni, AWS EC2 (t2.micro) gibi
+kısıtlı kaynaklarda bile işlemciyi yormadan saniyeler içinde sonuç verebilmesidir.
+🧩 Bölüm 1 (Ek): Mini-Xception Kurulum ve Dosya Mantığı
+Sistemin "duygu tanıma" yeteneğini sıfırdan kod yazarak değil, daha önce binlerce
+yüz fotoğrafıyla eğitilmiş hazır bir "beyin" (model dosyası) kullanarak sunucuya
+öğreteceğiz.
+1. .h5 ve .tflite Dosyaları Nedir?
+.h5 Dosyası: Bu, yapay zekanın "tam kapasite" hafızasıdır. İçinde hem modelin
+mimarisi (nöronların dizilimi) hem de öğrenmiş olduğu bilgiler (ağırlıklar) bulunur.
+Bilgisayarlarda ve sunucularda (AWS) en yaygın kullanılan formattır.
+.tflite Dosyası: Bu, .h5 dosyasının "diyet yapmış" halidir. Google’ın mobil cihazlar ve
+kısıtlı donanımlar için optimize ettiği çok hafif bir formattır. Biz AWS kullandığımız için
+öncelikle .h5 tercih edeceğiz, ancak sistem çok yavaş kalırsa .tflite versiyonuna
+geçebiliriz.
+2. Bu Dosyaları Nereden Bulacağız?
+Bu modelleri kendimiz eğitmek aylar sürebilir. Bu yüzden literatürde kendini
+kanıtlamış, FER2013 (yüz ifadesi veri seti) ile eğitilmiş hazır dosyaları kullanacağız:
+GitHub: "Mini-Xception pre-trained models" aramasıyla en güncel dosyalara
+ulaşılabilir.
+Kaggle: Veri bilimcilerin paylaştığı yüksek doğruluk oranlı .h5 dosyaları buradan
+indirilebilir.
+Hazır Kütüphaneler: Python'daki fer kütüphanesi gibi araçlar, ilk çalıştırmada bu
+dosyaları kendisi otomatik indirip sisteme kurabilir.
+3. Sunucuya Kurulum Adımları (Sözlü Anlatım)
+Kütüphaneleri Tanıtmak: Sunucuya "Sen artık yapay zekadan ve görüntü işlemeden
+anlıyorsun" demek için TensorFlow ve OpenCV gibi temel kütüphaneleri bir komutla
+yükleyecek.
+Dosyayı Yerleştirmek: İnternetten bulduğumuz o hazır ".h5" dosyasını sunucunun
+içine bir klasöre koyacak.
+Harekete Geçirmek: Python kodunda "Şu klasördeki modeli yükle ve gelen
+fotoğrafları buna sor" talimatını verecek.
+Sonuç Almak: Artık sunucu, dışarıdan gelen her fotoğrafı bu dosyadaki bilgilerle
+karşılaştırıp "Bu kullanıcı %80 ihtimalle mutlu" cevabını saniyeler içinde verebilecek.
+🌐 Bölüm 2: Web Kontrol Paneli ve Veri Yönetimi (Firebase &
+Web)
+Bu bölüm, kullanıcının duygusal verilerini anlamlı grafiklere dönüştüğü, hesabını
+yönettiği ve AWS'den gelen analiz sonuçlarının depolandığı alandır.
+2.1. Teknoloji Yığını (Tech Stack):
+Frontend: React.js veya Vue.js (Modern ve hızlı bir arayüz için).
+Backend & Veritabanı: Firebase (Firestore, Auth, Hosting).
+Grafik Kütüphanesi: Chart.js veya Recharts.
+2.2. Kullanıcı Kayıt ve Giriş Sistemi (Firebase Auth):
+Kullanıcılar e-posta ve şifre ile standart bir şekilde üye olurlar.
+Firebase Auth sayesinde güvenlik katmanı hazır olarak gelir, ekstra backend
+yazmaya gerek kalmaz.
+2.3. Token (App Key) Mekanizması ve Eşleşme:
+Üretim: Kullanıcı sisteme girdiğinde ona özel benzersiz bir anahtar (Örn:
+ATV-XXXX-YYYY) oluşturulur ve Firestore'da saklanır.
+Eşleşme: Kullanıcı bu anahtarı kopyalayıp Windows İstemcisine (Bölüm 3) yapıştırır.
+Böylece AWS üzerinden gelen veriler "Bu anahtar Ali'ye ait" denilerek doğru hesaba
+işlenir.
+2.4. Firestore Veri Yapısı (NoSQL):
+Veriler, hiyerarşik ve sorgulanabilir bir yapıda saklanacaktır:
+users (Koleksiyon)
+{userId} (Döküman)
+profile: Ad, soyad, app_key...
+emotions (Alt Koleksiyon):
+{autoId}: {timestamp, emotion
+label, confidence}
+_
+2.5. Dashboard ve Görselleştirme:
+Duygu Dağılımı: Son 14 günde en çok hangi duygular yaşanmış (Pasta Grafik).
+Zaman Çizelgesi: Gün içindeki duygusal dalgalanmalar (Çizgi Grafik).
+AI Rapor Alanı: Bölüm 4'ten (Gemini) gelen metinsel yorumların ve önerilerin şık bir
+kart içerisinde gösterilmesi.
+2.6. Hosting ve Yayınlama:
+Firebase Hosting: Web sitesi auratwin.web.app adresinde tamamen ücretsiz olarak
+host edilir. Tek komutla (firebase deploy) güncellenir.
+💻 Bölüm 3: Windows İstemci Uygulaması (Desktop App)
+Bu bölüm, kullanıcının bilgisayarında arka planda çalışan, belirli aralıklarla görüntü
+yakalayan ve bu görüntüyü analiz için AWS sunucusuna ileten "hafif" bir Python
+uygulamasıdır.
+3.1. Teknoloji Seçimi:
+Dil: Python (Sistem kaynaklarına erişim ve hızlı geliştirme için).
+Kütüphaneler:
+OpenCV (cv2): Kamera erişimi ve fotoğraf çekimi için.
+PyQt5 / CustomTkinter: Sade ve modern bir kullanıcı arayüzü (GUI) için.
+Pystray: Uygulamanın sağ alt köşede (System Tray) çalışmasını sağlamak için.
+Requests: AWS API'sine güvenli veri gönderimi için.
+3.2. Çalışma Mekanizması (Sessiz Çalışma):
+Background Mode: Uygulama açıldığında ana pencere kapatılsa bile sağ alt köşede
+(saat yanında) AuraTwin logosuyla çalışmaya devam eder.
+Zamanlayıcı (Timer): Kullanıcı tarafından belirlenen (varsayılan: 5 dakika) aralıklarla
+"kamera tetikleme" sinyali gönderilir.
+Capture & Release: Kamera sadece fotoğrafın çekildiği o milisaniyede açılır ve kare
+alınır alınmaz hemen serbest bırakılır. Bu sayede kamera sürekli meşgul edilmez.
+3.3. Hesap Eşleşmesi (Token Login):
+Kullanıcı uygulamayı ilk kurduğunda Web Panel'den (Bölüm 2) aldığı kendine özel
+App Key'i girer.
+Uygulama bu anahtarı yerel bir yapılandırma dosyasında saklar ve her gönderimde
+AWS'ye "Ben şu anahtara sahip kullanıcıyım" bilgisini iletir.
+3.4. Güvenlik ve Gizlilik (Edge Processing):
+Disk Kaydı Yok: Çekilen fotoğraf asla bilgisayarın hard diskine kaydedilmez. Görsel
+doğrudan RAM üzerinden şifrelenerek (base64 formatında) AWS'ye post edilir.
+Kamera Durum Kontrolü: Eğer kullanıcı o an başka bir uygulamada (Zoom, Meet vb.)
+kamerayı kullanıyorsa, AuraTwin çakışma yaratmaz; o periyodu pas geçer ve bir
+sonraki aralığı bekler.
+3.5. Kullanıcı Kontrolleri:
+Sağ alttaki simgeye sağ tıklandığında: "Analizi Durdur/Başlat", "Ayarlar (Aralık
+Belirleme)", "Dashboard'a Git" ve "Çıkış" seçenekleri sunulur.
+🧠 Bölüm 4: Dijital İkiz ve Akıllı Analiz (Gemini AI)
+Bu bölüm, Bölüm 1’de işlenen ham duygusal verilerin (mutlu, üzgün, nötr vb.)
+anlamlandırıldığı, kullanıcının duygusal bir kopyasının (Digital Twin) oluşturulduğu ve
+kişiselleştirilmiş farkındalık raporlarının üretildiği zeka katmanıdır.
+4.1. Analiz Tetikleme Mekanizması (On-Demand Analysis)
+Kullanıcı Kontrolü: Analiz süreci sunucu tarafından otomatik değil, kullanıcı
+tarafından Dashboard üzerindeki "Haftalık Raporumu Oluştur" butonuna basıldığında
+tetiklenir.
+Veri Hazırlığı: Butona basıldığı an, Web arayüzü (React/Vue) Firebase Firestore'a
+bağlanarak kullanıcının son 14 gününe ait tüm duygusal logları (zaman damgası +
+duygu etiketi + güven skoru) yerel bir liste olarak çeker.
+4.2. Gemini AI Entegrasyonu ve Veri İletimi
+Teknoloji: Google Gemini 2.5 Flash API.
+İletişim Kurallar: Web uygulaması, çekilen verileri "JSON" formatında bir paket haline
+getirir ve doğrudan Gemini API endpoint'ine gönderir.
+Prompt Mühendisliği (Personel Tanımlama): Gemini'a veriler gönderilirken şu sistem
+talimatı (System Instruction) eklenir:
+"Sen bir 'AuraTwin Well-being' asistanısın. Aşağıdaki veriler, kullanıcının bilgisayar
+başında geçen 14 gününe aittir. Bu verilerdeki örüntüleri (stresli saatler, en mutlu
+günler, duygusal dalgalanmalar) bul ve kullanıcıya empati kuran, bilimsel tabanlı
+öneriler içeren kısa bir rapor sun."
+4.3. Güvenlik ve Gizlilik (API Key Yönetimi)
+Gizleme: Gemini API Key, kodun içine açık bir şekilde yazılmaz. .env (Environment
+Variables) dosyasında tutulur.
+Derleme Güvenliği: Proje build (yayına alma) aşamasında bu anahtar
+şifrelenir/gizlenir. (Hocaya sunumda: "Güvenlik için API anahtarını sadece build-time
+sırasında enjekte ediyoruz" açıklaması yapılacaktır).
+4.4. Dijital İkiz Çıktıları ve Raporlama
+Kişiselleştirilmiş Özet: Gemini'dan dönen metin, Dashboard üzerinde şık bir kartta
+gösterilir. (Örn: "Bu hafta Salı ve Perşembe sabahları stres seviyenin arttığını fark
+ettik. Bu saatlerdeki ders yükün seni etkiliyor olabilir.")
+Aksiyon Önerileri (Self-Correction): AI, sadece durumu tespit etmez; "Nefes egzersizi
+yap", "O saatlerde 5 dakika ekran molası ver" gibi somut önerilerde bulunur.
+Kalıcı Kayıt: Üretilen rapor, kullanıcının her seferinde API kotasını harcamaması için
+Firestore'a last
+report alanına kaydedilir.
+_
+4.5. Neden Gemini? (Teknik Gerekçe)
+Hız: Flash modelleri milisaniyeler içinde cevap verir.
+Ücretsiz Kota: Günlük 1500 isteğe kadar ücretsiz kullanım sunması, öğrenci projesi
+bütçesi (0 TL) için en ideal çözümdür.
+Bağımsızlık: AWS sunucusuna ekstra yük bindirmeden, tüm zeka işleminin web
+üzerinden halledilmesini sağlar.
+🗄️ Bölüm 5: Firestore Veri Yapısı ve Erişim Rolleri
+
+Bu bölüm, sistemdeki her bileşenin (Web, AWS, Client) Firestore üzerinde tam olarak
+ne okuduğunu ve ne yazdığını tanımlar. Ekipler arası tutarlılık için bu yapıya kesinlikle
+uyulmalıdır.
+
+5.1. Koleksiyon Yapısı
+
+app_keys/{app_key}
+  Alanlar : uid (string), created_at (Timestamp)
+  Açıklama: App Key'den Firebase UID'ye O(1) çözümleme tablosu.
+            AWS sunucusu bu koleksiyonu okuyarak hangi kullanıcıya ait olduğunu bulur.
+
+users/{uid}/profile/data
+  Alanlar : name, surname, email, app_key, created_at
+  Açıklama: Kullanıcı profili. Web kayıt akışı tarafından oluşturulur.
+
+users/{uid}/emotions/{autoId}
+  Alanlar : timestamp (Timestamp), emotion_label (string), confidence (float 0-1)
+  Açıklama: Her duygu analizi sonucu burada saklanır.
+            SADECE AWS sunucusu yazar (Firebase Admin SDK ile).
+
+users/{uid}/last_report/data
+  Alanlar : generated_at (Timestamp), content (string)
+  Açıklama: Gemini tarafından üretilen en son Well-being raporu.
+            Web dashboard üzerindeki "Rapor Oluştur" butonu tetikler ve yazar.
+
+5.2. Bileşen Erişim Tablosu
+
+Koleksiyon / Belge             | Web (Next.js) | AWS (Admin SDK) | Client (Python)
+-------------------------------|---------------|-----------------|----------------
+app_keys/{app_key}             | YAZAR         | OKUR            | -
+users/{uid}/profile/data       | YAZAR, OKUR   | -               | -
+users/{uid}/emotions/{autoId}  | OKUR          | YAZAR           | -
+users/{uid}/last_report/data   | YAZAR, OKUR   | -               | -
+
+Client (Python masaüstü uygulaması) Firestore'a hiç bağlanmaz.
+Yalnızca AWS API'sine istek gönderir; Firestore işlemleri AWS tarafından yapılır.
+
+5.3. AWS İstek Akışı (Client → AWS → Firestore)
+
+1. Client, kullanıcının App Key'ini yerel config dosyasından okur.
+2. Client, kameradan alınan kareyi base64 formatına çevirir.
+3. Client şu payload'ı AWS /predict-emotion endpoint'ine POST eder:
+     { "app_key": "ATV-XXXX-YYYY", "image": "<base64>", "timestamp": "<ISO8601>" }
+4. AWS, app_keys/{app_key} dokümanını okur → uid'yi alır.
+5. AWS, Mini-Xception modeli ile görseli analiz eder → duygu etiketi + güven skoru üretir.
+6. AWS, görsel RAM'den silinir (disk'e asla yazılmaz).
+7. AWS, users/{uid}/emotions/{autoId} dokümanını Firestore'a yazar:
+     { "timestamp": <Timestamp>, "emotion_label": "happy", "confidence": 0.87 }
+
+5.4. Firestore Security Rules Özeti
+
+- users/{uid}/**  : Yalnızca o kullanıcı (request.auth.uid == uid) okuyup yazabilir.
+- app_keys/{key}  : Yalnızca kayıtlı kullanıcılar CREATE yapabilir; READ/UPDATE/DELETE kapalı.
+                    AWS Admin SDK, güvenlik kurallarını bypass eder (sunucu taraflı).
+
+🏁 Sonuç ve Vizyon
+AuraTwin, sadece bir duygu tanıma yazılımı değil; gizlilik esaslı, ölçeklenebilir ve
+yapay zeka destekli bir Well-being (Refah) asistanıdır. Seçilen hibrit mimari (AWS +
+Firebase + Gemini), projenin 2026 yılı teknolojik standartlarında, maliyet-etkin ve
+yüksek performanslı bir şekilde hayata geçirilmesini garanti eder.
+GitHub Organizasyonu: github.com/AuraTwin
+Website: https://auratwin.netlify.app/
