@@ -54,7 +54,7 @@ export default function ProductPage() {
             </div>
             <div className="bg-gradient-to-br from-primary-100 to-accent-100 dark:from-gray-700 dark:to-gray-700 p-8 rounded-2xl" data-reveal data-reveal-delay="150">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">7 Emotion Categories</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">8 Emotion Categories</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     { emoji: '😊', label: 'Happy' },
@@ -64,6 +64,7 @@ export default function ProductPage() {
                     { emoji: '😐', label: 'Neutral' },
                     { emoji: '😨', label: 'Fear' },
                     { emoji: '🤢', label: 'Disgust' },
+                    { emoji: '😒', label: 'Contempt' },
                   ].map((emotion) => (
                     <div key={emotion.label} className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                       <div className="text-3xl mb-1">{emotion.emoji}</div>

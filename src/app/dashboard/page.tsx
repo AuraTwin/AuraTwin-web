@@ -36,6 +36,7 @@ const EMOTION_COLORS: Record<string, string> = {
   Neutral: '#94a3b8',
   Fear: '#8b5cf6',
   Disgust: '#14b8a6',
+  Contempt: '#800080',
 };
 
 const EMOTION_SCORE: Record<string, number> = {
@@ -45,6 +46,7 @@ const EMOTION_SCORE: Record<string, number> = {
   Sad: 30,
   Fear: 25,
   Angry: 20,
+  Contempt: 20,
   Disgust: 15,
 };
 

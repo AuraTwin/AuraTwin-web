@@ -83,7 +83,7 @@ export default function SciencePage() {
                   <ul className="space-y-3">
                     {[
                       <><strong>35,887 grayscale images</strong> of facial expressions</>,
-                      <><strong>7 emotion categories</strong> (Happy, Sad, Angry, Surprised, Neutral, Fear, Disgust)</>,
+                      <><strong>8 emotion categories</strong> (Happy, Sad, Angry, Surprised, Neutral, Fear, Disgust, Contempt)</>,
                       <><strong>Diverse demographics</strong> ensuring model generalization</>,
                       <><strong>Real-world conditions</strong> including varying lighting and angles</>,
                     ].map((item, i) => (
@@ -102,10 +102,11 @@ export default function SciencePage() {
                         { emotion: 'Happy', percentage: '24%', width: 24 },
                         { emotion: 'Neutral', percentage: '22%', width: 22 },
                         { emotion: 'Sad', percentage: '18%', width: 18 },
-                        { emotion: 'Angry', percentage: '15%', width: 15 },
+                        { emotion: 'Angry', percentage: '14%', width: 14 },
                         { emotion: 'Surprised', percentage: '12%', width: 12 },
                         { emotion: 'Fear', percentage: '6%', width: 6 },
                         { emotion: 'Disgust', percentage: '3%', width: 3 },
+                        { emotion: 'Contempt', percentage: '1%', width: 1 },
                       ].map((item) => (
                         <div key={item.emotion} className="flex justify-between items-center">
                           <span className="text-gray-700 dark:text-gray-300">{item.emotion}</span>
@@ -135,7 +136,7 @@ export default function SciencePage() {
                         ['Convolutional Blocks:', 'Efficient feature extraction'],
                         ['Depthwise Separable Convolutions:', 'Reduced parameters'],
                         ['Residual Connections:', 'Improved gradient flow'],
-                        ['Output Layer:', '7-class softmax classifier'],
+                        ['Output Layer:', '8-class softmax classifier'],
                       ].map(([label, desc]) => (
                         <li key={label} className="flex items-start">
                           <span className="text-accent-600 mr-2">→</span>
