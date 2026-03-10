@@ -51,6 +51,12 @@ function formatDate(ts: { toDate: () => Date }): string {
   return ts.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+function formatDateTime(ts: { toDate: () => Date }): string {
+  return ts.toDate().toLocaleString('en-US', {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+}
+
 function buildPieData(logs: EmotionLog[]) {
   const counts: Record<string, number> = {};
   logs.forEach((l) => {
@@ -72,6 +78,38 @@ function buildTimelineData(logs: EmotionLog[]) {
   }));
 }
 
+function SkeletonDashboard() {
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header skeleton */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="skeleton h-8 w-64 mb-2" />
+          <div className="skeleton h-4 w-48" />
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* App key card skeleton */}
+        <div className="skeleton h-36 rounded-2xl" />
+        {/* Download card skeleton */}
+        <div className="skeleton h-20 rounded-2xl" />
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="skeleton h-28 rounded-xl" />
+          ))}
+        </div>
+        {/* Charts skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="skeleton h-80 rounded-xl" />
+          <div className="skeleton h-80 rounded-xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -83,6 +121,7 @@ export default function DashboardPage() {
   const [reportError, setReportError] = useState('');
   const [copied, setCopied] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
+  const [showAllLogs, setShowAllLogs] = useState(false);
 
   const loadData = useCallback(async (uid: string) => {
     setDataLoading(true);
@@ -134,6 +173,9 @@ export default function DashboardPage() {
     }
   };
 
+  if (loading || dataLoading) return <SkeletonDashboard />;
+  if (!user) return null;
+
   // Stats
   const totalSessions = logs.length;
   const last7 = logs.filter((l) => {
@@ -152,26 +194,17 @@ export default function DashboardPage() {
 
   const pieData = buildPieData(logs);
   const timelineData = buildTimelineData(logs);
-
-  if (loading || dataLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500">Loading…</div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
+  const displayedLogs = showAllLogs ? [...logs].reverse() : [...logs].reverse().slice(0, 10);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Welcome back, {profile ? `${profile.name} ${profile.surname}` : (user.displayName ?? 'there')}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Your emotional well-being dashboard</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Your emotional well-being dashboard</p>
         </div>
       </div>
 
@@ -198,30 +231,53 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Download Windows Client */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Windows Client</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Download the AuraTwin desktop app, enter your App Key above, and start tracking your emotions in real time.
+              </p>
+            </div>
+            <a
+              href="https://github.com/AuraTwin/AuraTwin-windowsClient/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded-lg hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              Download on GitHub
+            </a>
+          </div>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">Total Sessions</p>
-            <p className="text-3xl font-bold text-gray-900">{totalSessions || '--'}</p>
-            <p className="text-xs text-gray-400 mt-1">Last 14 days</p>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Sessions</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalSessions || '--'}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Last 14 days</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">Most Common Emotion</p>
-            <p className="text-3xl font-bold text-gray-900">{mostCommon}</p>
-            <p className="text-xs text-gray-400 mt-1">Last 7 days</p>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Most Common Emotion</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{mostCommon}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Last 7 days</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">Last Session</p>
-            <p className="text-3xl font-bold text-gray-900">{lastSession}</p>
-            <p className="text-xs text-gray-400 mt-1">Most recent log</p>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Last Session</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{lastSession}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Most recent log</p>
           </div>
         </div>
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pie Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Emotion Distribution</h2>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Emotion Distribution</h2>
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
@@ -243,17 +299,19 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400">
+              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
                 <div className="text-5xl mb-3">📊</div>
-                <p className="font-medium">No data yet</p>
-                <p className="text-sm mt-1">Start a session with the Windows client to see your emotion distribution</p>
+                <p className="font-medium text-gray-600 dark:text-gray-400">No emotion data yet</p>
+                <p className="text-sm mt-2">
+                  Download the Windows client, enter your App Key, and start a session to see your emotion distribution here.
+                </p>
               </div>
             )}
           </div>
 
           {/* Line Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Well-being Score Over Time</h2>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Well-being Score Over Time</h2>
             {timelineData.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={timelineData}>
@@ -273,22 +331,89 @@ export default function DashboardPage() {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400">
+              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
                 <div className="text-5xl mb-3">📈</div>
-                <p className="font-medium">No timeline data yet</p>
-                <p className="text-sm mt-1">Your daily well-being score will appear here once you start logging sessions</p>
+                <p className="font-medium text-gray-600 dark:text-gray-400">No timeline data yet</p>
+                <p className="text-sm mt-2">
+                  Your daily well-being score will appear here once you start logging sessions with the desktop client.
+                </p>
               </div>
             )}
           </div>
         </div>
 
+        {/* Emotion Log Table */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Sessions</h2>
+            {logs.length > 0 && (
+              <span className="text-xs text-gray-400 dark:text-gray-500">{logs.length} total in last 14 days</span>
+            )}
+          </div>
+
+          {logs.length > 0 ? (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-700">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date & Time</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Emotion</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Confidence</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Score</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
+                    {displayedLogs.map((log, i) => (
+                      <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="px-6 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          {formatDateTime(log.timestamp)}
+                        </td>
+                        <td className="px-6 py-3">
+                          <span
+                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold text-white"
+                            style={{ backgroundColor: EMOTION_COLORS[log.emotion_label] ?? '#94a3b8' }}
+                          >
+                            {log.emotion_label}
+                          </span>
+                        </td>
+                        <td className="px-6 py-3 text-gray-600 dark:text-gray-400">
+                          {log.confidence != null ? `${(log.confidence * 100).toFixed(1)}%` : '—'}
+                        </td>
+                        <td className="px-6 py-3 text-gray-600 dark:text-gray-400">
+                          {EMOTION_SCORE[log.emotion_label] ?? 50}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {logs.length > 10 && (
+                <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-700">
+                  <button
+                    onClick={() => setShowAllLogs(!showAllLogs)}
+                    className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium"
+                  >
+                    {showAllLogs ? 'Show less' : `Show all ${logs.length} sessions`}
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="px-6 py-12 text-center text-gray-400 dark:text-gray-500">
+              <p className="font-medium text-gray-600 dark:text-gray-400 mb-1">No sessions recorded yet</p>
+              <p className="text-sm">Sessions will appear here after you use the Windows client.</p>
+            </div>
+          )}
+        </div>
+
         {/* AI Report Card */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">AI Well-being Report</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Well-being Report</h2>
               {report && (
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Generated on {report.generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })}
                 </p>
               )}
@@ -303,17 +428,17 @@ export default function DashboardPage() {
           </div>
 
           {reportError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
               {reportError}
             </div>
           )}
 
           {report ? (
-            <div className="bg-gray-50 rounded-xl p-5 text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-5 text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
               {report.content}
             </div>
           ) : (
-            <div className="text-gray-400 text-sm">
+            <div className="text-gray-400 dark:text-gray-500 text-sm">
               No report generated yet. Click &quot;Generate Weekly Report&quot; to get your personalized AI analysis.
             </div>
           )}

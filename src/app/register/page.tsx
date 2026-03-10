@@ -75,17 +75,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <Image src="/logo.png" alt="AuraTwin" width={48} height={48} className="rounded-xl mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
-            <p className="text-gray-600 mt-1">Join AuraTwin and start tracking your emotions</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create your account</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Join AuraTwin and start tracking your emotions</p>
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -93,7 +93,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   First Name
                 </label>
                 <input
@@ -104,11 +104,11 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   placeholder="Ali"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400"
                 />
               </div>
               <div>
-                <label htmlFor="surname" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="surname" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Last Name
                 </label>
                 <input
@@ -119,13 +119,13 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   placeholder="Yılmaz"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email
               </label>
               <input
@@ -136,12 +136,12 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Password
               </label>
               <input
@@ -153,8 +153,28 @@ export default function RegisterPage() {
                 required
                 minLength={6}
                 placeholder="Min. 6 characters"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700"
               />
+            </div>
+
+            {/* Terms checkbox */}
+            <div className="flex items-start gap-2">
+              <input
+                id="terms"
+                type="checkbox"
+                required
+                className="mt-1 w-4 h-4 accent-primary-600 flex-shrink-0"
+              />
+              <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
+                I agree to the{' '}
+                <Link href="/terms" className="text-primary-600 dark:text-primary-400 hover:underline">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy-policy" className="text-primary-600 dark:text-primary-400 hover:underline">
+                  Privacy Policy
+                </Link>
+              </label>
             </div>
 
             <button
@@ -166,9 +186,9 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link href="/login" className="text-primary-600 font-semibold hover:underline">
+            <Link href="/login" className="text-primary-600 dark:text-primary-400 font-semibold hover:underline">
               Sign in
             </Link>
           </p>

@@ -3,7 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import RevealObserver from "@/components/RevealObserver";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,15 +38,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          <Navigation />
-          <main className="pt-16">
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      {/* Anti-flash: apply saved theme before first paint */}
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme')||( window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className={`${inter.className} bg-white dark:bg-gray-900 transition-colors duration-200`}>
+        <ThemeProvider>
+          <AuthProvider>
+            <Navigation />
+            <main className="pt-16">
+              {children}
+            </main>
+            <Footer />
+            <RevealObserver />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
