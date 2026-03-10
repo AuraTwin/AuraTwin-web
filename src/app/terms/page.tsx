@@ -5,49 +5,54 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-white py-20">
+    <div className="min-h-screen bg-white dark:bg-gray-900 py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Terms of Service</h1>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Terms of Service</h1>
 
-        <div className="prose prose-lg max-w-none">
-          <p className="text-gray-600 mb-6">
-            <strong>Last Updated:</strong> January 2026
+        <div className="prose prose-lg max-w-none dark:prose-invert bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm">
+            <strong>Last Updated:</strong> March 2026
           </p>
 
-          <div className="bg-primary-50 border-l-4 border-primary-600 p-6 mb-8">
-            <p className="text-gray-700">
-              This is a placeholder terms of service page. Comprehensive terms of service will be published before the public launch of AuraTwin.
-            </p>
-          </div>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Important Notice</h2>
-            <p className="text-gray-700 mb-4">
-              AuraTwin is currently in development and not yet available for public use. These terms will govern the use of the AuraTwin service once it launches.
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Acceptance of Terms</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              By creating an account and using AuraTwin, you agree to these terms. AuraTwin is a graduation project developed at Yaşar University for educational and research purposes.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Key Points</h2>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>AuraTwin is a wellness tool, not a medical device</li>
-              <li>The service should not be used for diagnosing or treating medical conditions</li>
-              <li>Users must be 18 years or older (or have parental consent)</li>
-              <li>You own your data and can delete it at any time</li>
-              <li>We reserve the right to modify these terms with notice</li>
-            </ul>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Contact</h2>
-            <p className="text-gray-700">
-              For questions about our terms, please contact the AuraTwin team.
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. Description of Service</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              AuraTwin provides emotional awareness tools using facial expression analysis. This service is provided "as is" and is intended for wellness and self-reflection purposes only.
             </p>
           </section>
 
-          <section className="mb-8">
-            <p className="text-sm text-gray-600">
-              Complete terms of service will be available before our public launch, covering all aspects of service usage, user responsibilities, and legal protections.
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. Not a Medical Device</h2>
+            <p className="text-gray-700 dark:text-gray-300 font-semibold">
+              AuraTwin is NOT a medical device and is not intended for the diagnosis, treatment, or prevention of any mental health conditions or medical diseases. Always seek the advice of a qualified professional for health concerns.
+            </p>
+          </section>
+
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. User Responsibilities</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              Users are responsible for maintaining the security of their accounts and App Keys. You agree not to use the service for any illegal or unauthorized purposes.
+            </p>
+          </section>
+
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Limitation of Liability</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              As a student project, AuraTwin and its developers shall not be liable for any direct, indirect, or incidental damages resulting from the use or inability to use the service.
+            </p>
+          </section>
+
+          <section className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Changes to Terms</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              We reserve the right to modify these terms as the project evolves. Continued use of the service constitutes acceptance of updated terms.
             </p>
           </section>
         </div>

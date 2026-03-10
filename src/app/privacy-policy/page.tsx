@@ -5,45 +5,47 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-white py-20">
+    <div className="min-h-screen bg-white dark:bg-gray-900 py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Privacy Policy</h1>
 
-        <div className="prose prose-lg max-w-none">
-          <p className="text-gray-600 mb-6">
-            <strong>Last Updated:</strong> January 2026
+        <div className="prose prose-lg max-w-none dark:prose-invert bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm">
+            <strong>Last Updated:</strong> March 2026
           </p>
 
-          <div className="bg-primary-50 border-l-4 border-primary-600 p-6 mb-8">
-            <p className="text-gray-700">
-              This is a placeholder privacy policy. A comprehensive privacy policy will be published before the public launch of AuraTwin.
-            </p>
-          </div>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Commitment</h2>
-            <p className="text-gray-700 mb-4">
-              At AuraTwin, privacy is not just a feature—it's the foundation of everything we build. We are committed to:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Never storing your facial images</li>
-              <li>Keeping your emotional data locally on your device</li>
-              <li>Never selling or sharing your personal information</li>
-              <li>Providing complete transparency about our data practices</li>
-              <li>Giving you full control over your data at all times</li>
-            </ul>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Contact</h2>
-            <p className="text-gray-700">
-              For privacy-related questions or concerns, please contact the AuraTwin team.
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Data Collection</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              AuraTwin collects minimal personal information required for account creation (name, email). Emotional data is captured via facial expression analysis through your device's camera.
             </p>
           </section>
 
-          <section className="mb-8">
-            <p className="text-sm text-gray-600">
-              A detailed privacy policy covering all aspects of data collection, processing, storage, and your rights will be available before our public launch.
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. Processing & Storage</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              <strong>Facial images are never stored.</strong> All image processing occurs in real-time and images are immediately deleted. Only anonymized emotional metadata (e.g., "Happy: 80%") is stored. This data is kept locally on your device or encrypted in our secure database for your dashboard access.
+            </p>
+          </section>
+
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. Data Usage</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              Your data is used solely to provide you with personal emotional insights and well-being reports. We do not sell, trade, or share your personal data with third parties for marketing or any other purposes.
+            </p>
+          </section>
+
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. User Rights</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              You have the right to access, export, or delete your data at any time through the Settings page. Deleting your account will permanently remove all associated data from our systems.
+            </p>
+          </section>
+
+          <section className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Contact</h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              For any privacy-related inquiries, please reach out to the AuraTwin development team at Yaşar University.
             </p>
           </section>
         </div>
