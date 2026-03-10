@@ -34,11 +34,8 @@ export default function Navigation() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/product', label: 'Product' },
-    { href: '/privacy', label: 'Privacy & Security' },
     { href: '/science', label: 'Science' },
     { href: '/about', label: 'About' },
-    { href: '/faq', label: 'FAQ' },
-    { href: '/blog', label: 'Resources' },
   ];
 
   const handleLogout = async () => {

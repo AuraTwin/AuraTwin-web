@@ -41,11 +41,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-sm hover:text-white transition-colors">
-                  Privacy & Security
-                </Link>
-              </li>
-              <li>
                 <Link href="/science" className="text-sm hover:text-white transition-colors">
                   Science & Research
                 </Link>
@@ -77,16 +72,6 @@ export default function Footer() {
                   Team
                 </Link>
               </li>
-              <li>
-                <Link href="/blog" className="text-sm hover:text-white transition-colors">
-                  Resources
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-sm hover:text-white transition-colors">
-                  FAQ
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -115,7 +100,7 @@ export default function Footer() {
               &copy; {currentYear} AuraTwin. All rights reserved.
             </p>
             <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <span>Developed by Yaşar University Computer Engineering</span>
+              <span>Developed by Yaşar University Computer Engineering Students</span>
             </div>
           </div>
         </div>
