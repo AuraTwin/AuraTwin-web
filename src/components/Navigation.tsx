@@ -46,20 +46,22 @@ export default function Navigation() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Image src="/logo.png" alt="AuraTwin" width={32} height={32} className="rounded-lg" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">AuraTwin</span>
-          </Link>
+        <div className="flex justify-between items-center h-16 relative">
+          {/* Logo - Left */}
+          <div className="flex-shrink-0">
+            <Link href="/" className="flex items-center space-x-2">
+              <Image src="/logo.png" alt="AuraTwin" width={32} height={32} className="rounded-lg" />
+              <span className="text-xl font-bold text-gray-900 dark:text-white">AuraTwin</span>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation - Absolute Centered */}
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 rounded-md transition-colors"
+                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 rounded-md transition-colors whitespace-nowrap"
               >
                 {link.label}
               </Link>
@@ -67,7 +69,7 @@ export default function Navigation() {
           </div>
 
           {/* Right side: theme toggle + auth */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
             {/* Dark mode toggle */}
             <button
               onClick={toggleTheme}
@@ -133,7 +135,7 @@ export default function Navigation() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 rounded-md transition-colors"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 rounded-md transition-colors text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
