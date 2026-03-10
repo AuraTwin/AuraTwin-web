@@ -45,10 +45,10 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {[
-              { name: 'Yiğit Emre Çay', role: 'Lead Developer', description: 'Specialized in AI/ML and system architecture. Led the development of the emotion recognition model.' },
-              { name: 'Ali Haktan Sığın', role: 'Backend Engineer', description: 'Focused on server infrastructure and privacy-first architecture implementation.' },
-              { name: 'Utku Derici', role: 'Full Stack Developer', description: 'Built the desktop client and handled frontend-backend integration.' },
-              { name: 'Ahmet Özgür Korkmaz', role: 'Systems Engineer', description: 'Designed the security protocols and data encryption systems.' },
+              { name: 'Ali Haktan Sığın', role: 'Project Leader & Full Stack Developer', description: 'Led the project and developed the website, dashboard, and Firebase integration (Authentication & Firestore).' },
+              { name: 'Ahmet Özgür Korkmaz', role: 'Cloud Infrastructure Engineer', description: 'Managed AWS virtual server setup and deployment of the backend Python application.' },
+              { name: 'Utku Derici', role: 'Windows Client Developer', description: 'Developed and tested the Windows desktop client application and handled integration.' },
+              { name: 'Yiğit Emre Çay', role: 'QA Engineer & Support', description: 'Conducted comprehensive system testing and provided technical assistance throughout development.' },
             ].map((member, i) => (
               <div key={member.name} className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-reveal data-reveal-delay={`${i * 80}`}>
                 <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full mx-auto mb-4 flex items-center justify-center">
