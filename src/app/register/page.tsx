@@ -18,10 +18,13 @@ export default function RegisterPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [form, setForm] = useState({ name: '', surname: '', email: '', password: '' });
+  const [isRegistering, setIsRegistering] = useState(false);
 
+  // Redirect already-logged-in users, but not while a registration is in progress
+  // (auth state fires before Firestore writes complete, causing a premature redirect)
   useEffect(() => {
-    if (!authLoading && user) router.replace('/dashboard');
-  }, [user, authLoading, router]);
+    if (!authLoading && user && !isRegistering) router.replace('/dashboard');
+  }, [user, authLoading, router, isRegistering]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +36,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setIsRegistering(true);
     try {
       if (!auth || !db) throw new Error('Firebase is not configured.');
       const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
@@ -56,6 +60,7 @@ export default function RegisterPage() {
       });
       router.push('/dashboard');
     } catch (err: unknown) {
+      setIsRegistering(false);
       const msg = err instanceof Error ? err.message : 'Registration failed.';
       if (msg.includes('email-already-in-use')) {
         setError('An account with this email already exists.');
