@@ -89,12 +89,6 @@ export default function Navigation() {
                   >
                     Dashboard
                   </Link>
-                  <Link
-                    href="/settings"
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                  >
-                    Settings
-                  </Link>
                   <button
                     onClick={handleLogout}
                     className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -157,13 +151,6 @@ export default function Navigation() {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Dashboard
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="mx-3 px-4 py-2 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-center"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Settings
                     </Link>
                     <button
                       onClick={() => { setIsMenuOpen(false); handleLogout(); }}

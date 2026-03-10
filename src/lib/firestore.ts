@@ -41,6 +41,11 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   return snap.exists() ? (snap.data() as UserProfile) : null;
 }
 
+export async function updateUserProfile(uid: string, data: Partial<UserProfile>): Promise<void> {
+  const docRef = doc(db, 'users', uid, 'profile', 'data');
+  await setDoc(docRef, data, { merge: true });
+}
+
 export async function getEmotionLogs(uid: string, days = 14): Promise<EmotionLog[]> {
   const since = new Date();
   since.setDate(since.getDate() - days);

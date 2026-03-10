@@ -11,12 +11,14 @@ import {
   reauthenticateWithCredential,
   deleteUser,
 } from 'firebase/auth';
+import { getUserProfile, updateUserProfile } from '@/lib/firestore';
 
 export default function SettingsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  const [displayName, setDisplayName] = useState('');
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
   const [nameSuccess, setNameSuccess] = useState('');
   const [nameError, setNameError] = useState('');
   const [nameSaving, setNameSaving] = useState(false);
@@ -35,8 +37,18 @@ export default function SettingsPage() {
   const [showDeleteSection, setShowDeleteSection] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) router.push('/login');
-    if (user) setDisplayName(user.displayName ?? '');
+    if (!loading && !user) {
+      router.push('/login');
+      return;
+    }
+    if (user) {
+      getUserProfile(user.uid).then((profile) => {
+        if (profile) {
+          setName(profile.name || '');
+          setSurname(profile.surname || '');
+        }
+      });
+    }
   }, [user, loading, router]);
 
   const handleNameUpdate = async (e: React.FormEvent) => {
@@ -46,10 +58,13 @@ export default function SettingsPage() {
     setNameSuccess('');
     setNameSaving(true);
     try {
-      await updateProfile(user, { displayName });
-      setNameSuccess('Display name updated successfully.');
+      await Promise.all([
+        updateUserProfile(user.uid, { name, surname }),
+        updateProfile(user, { displayName: name }),
+      ]);
+      setNameSuccess('Profile updated successfully.');
     } catch {
-      setNameError('Failed to update display name.');
+      setNameError('Failed to update profile.');
     } finally {
       setNameSaving(false);
     }
@@ -135,17 +150,32 @@ export default function SettingsPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Display Name */}
+        {/* Profile Info */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Display Name</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Profile Information</h2>
           <form onSubmit={handleNameUpdate} className="space-y-4">
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your name"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400"
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="First name"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  value={surname}
+                  onChange={(e) => setSurname(e.target.value)}
+                  placeholder="Last name"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400"
+                />
+              </div>
+            </div>
             {nameSuccess && <p className="text-sm text-green-600 dark:text-green-400">{nameSuccess}</p>}
             {nameError && <p className="text-sm text-red-600 dark:text-red-400">{nameError}</p>}
             <button
@@ -153,7 +183,7 @@ export default function SettingsPage() {
               disabled={nameSaving}
               className="px-5 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-60 text-sm"
             >
-              {nameSaving ? 'Saving…' : 'Save Name'}
+              {nameSaving ? 'Saving…' : 'Save Changes'}
             </button>
           </form>
         </div>
