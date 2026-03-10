@@ -206,7 +206,7 @@ export default function Home() {
             Create Free Account
           </Link>
           <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            No credit card required. Early access launching Q2 2026.
+            No credit card required. Launching Q2 2026.
           </p>
         </div>
       </section>

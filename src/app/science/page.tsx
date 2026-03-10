@@ -124,19 +124,19 @@ export default function SciencePage() {
               </div>
             </div>
 
-            {/* Mini-Xception Architecture */}
+            {/* EfficientNet Architecture */}
             <div className="bg-white dark:bg-gray-900 p-8 md:p-12 rounded-2xl shadow-lg" data-reveal>
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="order-2 md:order-1 bg-gradient-to-br from-accent-100 to-primary-100 dark:from-gray-700 dark:to-gray-700 p-8 rounded-xl">
                   <div className="bg-white dark:bg-gray-800 p-6 rounded-lg">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Model Architecture</h4>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Backend Technology</h4>
                     <ul className="space-y-3 text-sm">
                       {[
-                        ['Input Layer:', '48x48 grayscale images'],
-                        ['Convolutional Blocks:', 'Efficient feature extraction'],
-                        ['Depthwise Separable Convolutions:', 'Reduced parameters'],
-                        ['Residual Connections:', 'Improved gradient flow'],
-                        ['Output Layer:', '8-class softmax classifier'],
+                        ['Face Detection:', 'OpenCV DNN Module'],
+                        ['Detection Models:', 'ResNet-10 SSD (Caffe)'],
+                        ['Emotion Model:', 'enet_b0_8_best_afew'],
+                        ['Engine:', 'ONNX Runtime'],
+                        ['Hardware:', 'AWS t2.micro Optimized'],
                       ].map(([label, desc]) => (
                         <li key={label} className="flex items-start">
                           <span className="text-accent-600 mr-2">→</span>
@@ -147,16 +147,16 @@ export default function SciencePage() {
                   </div>
                 </div>
                 <div className="order-1 md:order-2">
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Mini-Xception CNN</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">EfficientNet & ONNX</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    We use the Mini-Xception architecture, a lightweight yet powerful convolutional neural network designed specifically for facial expression recognition.
+                    AuraTwin utilizes the <strong>enet_b0_8_best_afew</strong> model, an EfficientNet-B0 variant optimized for emotion recognition tasks. By deploying via ONNX Runtime, we achieve near-instant inference speeds.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Mini-Xception is based on Google&apos;s Xception architecture but optimized for emotion recognition with fewer parameters, enabling real-time processing without sacrificing accuracy.
+                    For face detection, we leverage OpenCV&apos;s built-in DNN module with a ResNet-10 SSD architecture, ensuring robust and privacy-conscious face localization without heavy external dependencies.
                   </p>
                   <div className="bg-primary-50 dark:bg-primary-900/30 p-4 rounded-lg">
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      <strong>Key Advantage:</strong> The architecture achieves high accuracy while remaining lightweight enough to process frames in real-time on consumer hardware.
+                      <strong>Deployment Note:</strong> This stack is specifically chosen for its low memory footprint, allowing it to run smoothly on lightweight cloud infrastructure like AWS t2.micro.
                     </p>
                   </div>
                 </div>
@@ -241,7 +241,7 @@ export default function SciencePage() {
           <h2 className="text-4xl font-bold mb-6">Experience Science-Backed Emotional Intelligence</h2>
           <p className="text-xl text-primary-100 mb-8">Join our beta program and be part of the future of emotional well-being.</p>
           <a href="/login" className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
-            Get Early Access
+            Get Started
           </a>
         </div>
       </section>

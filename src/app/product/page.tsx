@@ -123,12 +123,12 @@ export default function ProductPage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-800 p-8 rounded-2xl border border-primary-100 dark:border-gray-700" data-reveal>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Mini-Xception Architecture</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">EfficientNet Architecture</h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Our emotion recognition model is based on the Mini-Xception convolutional neural network, specifically designed for efficient and accurate facial expression analysis.
+                Our emotion recognition engine uses the enet_b0_8_best_afew model, a highly optimized EfficientNet-B0 variant deployed via ONNX Runtime for maximum performance.
               </p>
               <ul className="space-y-2">
-                {['Trained on 35,887+ facial expression images', 'Optimized for real-time processing', 'High accuracy across diverse demographics'].map((item) => (
+                {['High-performance ONNX Runtime engine', 'No heavy dependencies like TensorFlow', 'Optimized for AWS t2.micro instances'].map((item) => (
                   <li key={item} className="flex items-start">
                     <span className="text-primary-600 mr-2">•</span>
                     <span className="text-gray-700 dark:text-gray-300">{item}</span>
@@ -140,14 +140,14 @@ export default function ProductPage() {
             <div className="bg-gradient-to-br from-accent-50 to-white dark:from-gray-800 dark:to-gray-800 p-8 rounded-2xl border border-accent-100 dark:border-gray-700" data-reveal data-reveal-delay="150">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Hybrid Architecture</h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                AuraTwin uses a four-tier hybrid architecture: a Python desktop client captures and analyses emotions, an AWS FastAPI server handles processing, Firebase Firestore persists your data, and the web dashboard visualises insights with Gemini AI.
+                AuraTwin uses a four-tier hybrid architecture: a Python desktop client, an AWS FastAPI server with OpenCV DNN face detection, Firebase Firestore for data persistence, and a Gemini AI-powered web dashboard.
               </p>
               <div className="space-y-3">
                 {[
-                  { step: '1', label: 'Windows Client', desc: 'Python desktop app captures facial expressions via webcam and sends emotion data to the server using your App Key.' },
-                  { step: '2', label: 'AWS FastAPI Server', desc: 'Validates the App Key, runs the Mini-Xception model, and writes the result to Firestore.' },
+                  { step: '1', label: 'Windows Client', desc: 'Python desktop app captures facial expressions via webcam and sends data to the server using your App Key.' },
+                  { step: '2', label: 'AWS FastAPI Server', desc: 'Uses OpenCV DNN and enet_b0 models to process emotions efficiently on t2.micro instances.' },
                   { step: '3', label: 'Firebase Firestore', desc: 'Stores emotion logs securely in the cloud, linked to your account.' },
-                  { step: '4', label: 'Web Dashboard + Gemini AI', desc: 'Displays charts, stats, and AI-generated well-being reports powered by Gemini 2.0 Flash.' },
+                  { step: '4', label: 'Web Dashboard + Gemini AI', desc: 'Displays charts and generates AI well-being reports using Gemini 2.0 Flash.' },
                 ].map((item) => (
                   <div key={item.step} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-accent-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
@@ -213,7 +213,7 @@ export default function ProductPage() {
             href="/login"
             className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
           >
-            Get Early Access
+            Get Started
           </Link>
         </div>
       </section>
