@@ -344,18 +344,18 @@ export default function DashboardPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-700">
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date & Time</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Emotion</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Probability</th>
+                      <th className="w-1/3 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date & Time</th>
+                      <th className="w-1/3 px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Emotion</th>
+                      <th className="w-1/3 px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Probability</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                     {displayedLogs.map((log, i) => (
                       <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td className="px-6 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        <td className="w-1/3 px-6 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
                           {formatDateTime(log.timestamp)}
                         </td>
-                        <td className="px-6 py-3">
+                        <td className="w-1/3 px-6 py-3 text-center">
                           <span
                             className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold text-white"
                             style={{ backgroundColor: EMOTION_COLORS[log.emotion_label] ?? '#94a3b8' }}
@@ -363,7 +363,7 @@ export default function DashboardPage() {
                             {log.emotion_label}
                           </span>
                         </td>
-                        <td className="px-6 py-3 text-gray-600 dark:text-gray-400">
+                        <td className="w-1/3 px-6 py-3 text-right text-gray-600 dark:text-gray-400">
                           {log.confidence_score != null ? `${(log.confidence_score * 100).toFixed(1)}%` : '—'}
                         </td>
                       </tr>
