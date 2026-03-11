@@ -232,16 +232,16 @@ export default function DashboardPage() {
 
           {/* Expandable content */}
           {appKeyExpanded && (
-            <div className="px-6 pb-6 border-t border-white/20">
-              <p className="text-primary-100 text-sm mt-4 mb-3">
-                Enter this key in the AuraTwin Windows client to link your account
-              </p>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                {/* App Key + Copy */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <div className="font-mono text-2xl font-bold tracking-widest">
+            <div className="border-t border-white/20 grid grid-cols-1 sm:grid-cols-2">
+              {/* Left: App Key */}
+              <div className="px-6 py-5 flex flex-col justify-center gap-3">
+                <p className="text-primary-100 text-sm">
+                  Enter this key in the AuraTwin Windows client to link your account
+                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-2xl font-bold tracking-widest">
                     {profile?.app_key ?? '—'}
-                  </div>
+                  </span>
                   <button
                     onClick={handleCopy}
                     disabled={!profile?.app_key}
@@ -250,27 +250,27 @@ export default function DashboardPage() {
                     {copied ? 'Copied!' : 'Copy to Clipboard'}
                   </button>
                 </div>
+              </div>
 
-                {/* Windows Client download */}
-                <div className="flex items-center gap-3 lg:border-l lg:border-white/20 lg:pl-6">
-                  <div>
-                    <p className="text-sm font-semibold">Windows Client</p>
-                    <p className="text-primary-100 text-xs mt-0.5">
-                      Download the desktop app to start tracking.
-                    </p>
-                  </div>
-                  <a
-                    href="https://github.com/AuraTwin/AuraTwin-windowsClient/releases"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-semibold rounded-lg transition-colors border border-white/30"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                    </svg>
-                    Download on GitHub
-                  </a>
+              {/* Right: Windows Client */}
+              <div className="px-6 py-5 flex flex-col justify-center gap-3 sm:border-l border-t sm:border-t-0 border-white/20">
+                <div>
+                  <p className="text-sm font-semibold">Windows Client</p>
+                  <p className="text-primary-100 text-xs mt-1">
+                    Download the AuraTwin desktop app, enter your App Key, and start tracking your emotions in real time.
+                  </p>
                 </div>
+                <a
+                  href="https://github.com/AuraTwin/AuraTwin-windowsClient/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="self-start inline-flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-semibold rounded-lg transition-colors border border-white/30"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                  Download on GitHub
+                </a>
               </div>
             </div>
           )}
