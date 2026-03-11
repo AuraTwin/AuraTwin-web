@@ -394,9 +394,9 @@ export default function DashboardPage() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Well-being Report</h2>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-lg">
-                A report will be generated based on your current sessions. The more sessions you have, the more accurate the analysis will be. Reports cover up to the last 14 days of data.
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Digital Twin Report</h2>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                Your digital twin has been silently observing your emotional patterns through every session. Each capture makes its understanding of you deeper and more accurate — the more data it has, the more faithfully it can reflect your inner state. Generate a report to see what your twin has observed. Analysis covers up to the last 14 days of data.
               </p>
               {report && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
