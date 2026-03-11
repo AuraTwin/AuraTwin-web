@@ -392,12 +392,15 @@ export default function DashboardPage() {
 
         {/* AI Report Card */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Well-being Report</h2>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-lg">
+                A report will be generated based on your current sessions. The more sessions you have, the more accurate the analysis will be. Reports cover up to the last 14 days of data.
+              </p>
               {report && (
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Generated on {report.generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })}
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                  Last generated: {report.generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })}
                 </p>
               )}
             </div>
@@ -406,7 +409,7 @@ export default function DashboardPage() {
               disabled={generatingReport}
               className="shrink-0 px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-60"
             >
-              {generatingReport ? 'Generating…' : 'Generate Weekly Report'}
+              {generatingReport ? 'Generating…' : 'Generate Report'}
             </button>
           </div>
 
@@ -417,12 +420,16 @@ export default function DashboardPage() {
           )}
 
           {report ? (
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-5 text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-              {report.content}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl divide-y divide-gray-200 dark:divide-gray-600 text-sm text-gray-700 dark:text-gray-300">
+              {report.content.split('\n').filter((line) => line.trim()).map((line, i) => (
+                <div key={i} className="px-5 py-3 leading-relaxed">
+                  {line}
+                </div>
+              ))}
             </div>
           ) : (
-            <div className="text-gray-400 dark:text-gray-500 text-sm">
-              No report generated yet. Click &quot;Generate Weekly Report&quot; to get your personalized AI analysis.
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-5 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">
+              No report generated yet.
             </div>
           )}
         </div>
