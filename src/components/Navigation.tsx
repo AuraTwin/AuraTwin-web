@@ -39,8 +39,8 @@ export default function Navigation() {
   ];
 
   const handleLogout = async () => {
-    await logout();
     router.push('/');
+    await logout();
   };
 
   return (

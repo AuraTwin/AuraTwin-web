@@ -20,34 +20,22 @@ import {
   Cell,
   Tooltip,
   Legend,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
 
 const EMOTION_COLORS: Record<string, string> = {
+  Happiness: '#22c55e',
   Happy: '#22c55e',
-  Sad: '#3b82f6',
-  Angry: '#ef4444',
-  Surprised: '#f59e0b',
   Neutral: '#94a3b8',
+  Sadness: '#3b82f6',
+  Sad: '#3b82f6',
+  Anger: '#ef4444',
+  Angry: '#ef4444',
+  Surprise: '#f59e0b',
+  Surprised: '#f59e0b',
   Fear: '#8b5cf6',
   Disgust: '#14b8a6',
-  Contempt: '#800080',
-};
-
-const EMOTION_SCORE: Record<string, number> = {
-  Happy: 100,
-  Surprised: 70,
-  Neutral: 50,
-  Sad: 30,
-  Fear: 25,
-  Angry: 20,
-  Contempt: 20,
-  Disgust: 15,
+  Contempt: '#7c3aed',
 };
 
 function formatDate(ts: { toDate: () => Date }): string {
@@ -68,18 +56,6 @@ function buildPieData(logs: EmotionLog[]) {
   return Object.entries(counts).map(([name, value]) => ({ name, value }));
 }
 
-function buildTimelineData(logs: EmotionLog[]) {
-  const byDay: Record<string, number[]> = {};
-  logs.forEach((l) => {
-    const day = l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    if (!byDay[day]) byDay[day] = [];
-    byDay[day].push(EMOTION_SCORE[l.emotion_label] ?? 50);
-  });
-  return Object.entries(byDay).map(([date, scores]) => ({
-    date,
-    score: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
-  }));
-}
 
 function SkeletonDashboard() {
   return (
@@ -196,10 +172,15 @@ export default function DashboardPage() {
     last7.forEach((l) => { counts[l.emotion_label] = (counts[l.emotion_label] ?? 0) + 1; });
     return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
   })();
-  const lastSession = logs.length ? formatDate(logs[logs.length - 1].timestamp) : '--';
+  const lastSessionLog = logs.length ? logs[logs.length - 1] : null;
+  const lastSessionDate = lastSessionLog
+    ? lastSessionLog.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : '--';
+  const lastSessionTime = lastSessionLog
+    ? lastSessionLog.timestamp.toDate().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    : '';
 
   const pieData = buildPieData(logs);
-  const timelineData = buildTimelineData(logs);
   const displayedLogs = showAllLogs ? [...logs].reverse() : [...logs].reverse().slice(0, 10);
 
   return (
@@ -286,78 +267,43 @@ export default function DashboardPage() {
           </div>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Last Session</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{lastSession}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Most recent log</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{lastSessionDate}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{lastSessionTime || 'Most recent log'}</p>
           </div>
         </div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Pie Chart */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Emotion Distribution</h2>
-            {pieData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry) => (
-                      <Cell key={entry.name} fill={EMOTION_COLORS[entry.name] ?? '#94a3b8'} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
-                <div className="text-5xl mb-3">📊</div>
-                <p className="font-medium text-gray-600 dark:text-gray-400">No emotion data yet</p>
-                <p className="text-sm mt-2">
-                  Download the Windows client, enter your App Key, and start a session to see your emotion distribution here.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Line Chart */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Well-being Score Over Time</h2>
-            {timelineData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={timelineData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="score"
-                    stroke="#6366f1"
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                    name="Well-being Score"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
-                <div className="text-5xl mb-3">📈</div>
-                <p className="font-medium text-gray-600 dark:text-gray-400">No timeline data yet</p>
-                <p className="text-sm mt-2">
-                  Your daily well-being score will appear here once you start logging sessions with the desktop client.
-                </p>
-              </div>
-            )}
-          </div>
+        {/* Emotion Distribution */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Emotion Distribution</h2>
+          {pieData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={120}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {pieData.map((entry) => (
+                    <Cell key={entry.name} fill={EMOTION_COLORS[entry.name] ?? '#94a3b8'} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
+              <div className="text-5xl mb-3">📊</div>
+              <p className="font-medium text-gray-600 dark:text-gray-400">No emotion data yet</p>
+              <p className="text-sm mt-2">
+                Download the Windows client, enter your App Key, and start a session to see your emotion distribution here.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Emotion Log Table */}
@@ -377,8 +323,7 @@ export default function DashboardPage() {
                     <tr className="border-b border-gray-100 dark:border-gray-700">
                       <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date & Time</th>
                       <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Emotion</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Confidence</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Score</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Probability</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
@@ -396,10 +341,7 @@ export default function DashboardPage() {
                           </span>
                         </td>
                         <td className="px-6 py-3 text-gray-600 dark:text-gray-400">
-                          {log.confidence != null ? `${(log.confidence * 100).toFixed(1)}%` : '—'}
-                        </td>
-                        <td className="px-6 py-3 text-gray-600 dark:text-gray-400">
-                          {EMOTION_SCORE[log.emotion_label] ?? 50}
+                          {log.confidence_score != null ? `${(log.confidence_score * 100).toFixed(1)}%` : '—'}
                         </td>
                       </tr>
                     ))}

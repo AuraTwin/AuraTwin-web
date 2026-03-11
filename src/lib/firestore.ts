@@ -19,7 +19,7 @@ const db = _db as Firestore;
 export interface EmotionLog {
   timestamp: Timestamp;
   emotion_label: string;
-  confidence: number;
+  confidence_score: number;
 }
 
 export interface UserProfile {
@@ -83,7 +83,7 @@ export async function getLastReport(uid: string): Promise<WellbeingReport | null
  * users/{uid}/
  *   profile/data                   → { name, surname, email, app_key, created_at }
  *   last_report/data               → { generated_at, content }
- *   emotions/{autoId}              → { timestamp, emotion_label, confidence }
+ *   emotions/{autoId}              → { timestamp, emotion_label, confidence_score }
  *                                     ↑ written by AWS via Firebase Admin SDK
  */
 

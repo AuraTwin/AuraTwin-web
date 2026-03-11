@@ -10,7 +10,7 @@ export async function generateWellbeingReport(emotionLogs: EmotionLog[]): Promis
   const summary = emotionLogs.map((log) => ({
     date: log.timestamp.toDate().toLocaleDateString(),
     emotion: log.emotion_label,
-    confidence: Math.round(log.confidence * 100),
+    confidence: Math.round((log.confidence_score ?? 0) * 100),
   }));
 
   const prompt = `You are AuraTwin's Well-being Assistant. Analyze the following emotion log data from the past 14 days and generate a personalized, empathetic well-being report.
