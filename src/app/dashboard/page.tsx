@@ -220,7 +220,7 @@ export default function DashboardPage() {
               <svg className="w-4 h-4 text-primary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
-              <h2 className="text-base font-semibold">Your App Key</h2>
+              <h2 className="text-base font-semibold">Your App Key & Client Application</h2>
             </div>
             <svg
               className={`w-5 h-5 text-primary-200 transition-transform duration-200 ${appKeyExpanded ? 'rotate-180' : ''}`}
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-sm font-semibold">Windows Client</p>
                   <p className="text-primary-100 text-xs mt-1">
-                    Download the AuraTwin desktop app, enter your App Key, and start tracking your emotions in real time.
+                    Download the AuraTwin desktop app, enter your App Key, and start tracking your emotions.
                   </p>
                 </div>
                 <a
@@ -391,19 +391,10 @@ export default function DashboardPage() {
         </div>
 
         {/* AI Report Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Digital Twin Report</h2>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                Your digital twin has been silently observing your emotional patterns through every session. Each capture makes its understanding of you deeper and more accurate — the more data it has, the more faithfully it can reflect your inner state. Generate a report to see what your twin has observed. Analysis covers up to the last 14 days of data.
-              </p>
-              {report && (
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                  Last generated: {report.generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })}
-                </p>
-              )}
-            </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          {/* Header */}
+          <div className="px-6 py-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Digital Twin Report</h2>
             <button
               onClick={handleGenerateReport}
               disabled={generatingReport}
@@ -413,25 +404,41 @@ export default function DashboardPage() {
             </button>
           </div>
 
+          {/* Description */}
+          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+              Your digital twin has been silently observing your emotional patterns through every session. Each capture makes its understanding of you deeper and more accurate — the more data it has, the more faithfully it can reflect your inner state. Generate a report to see what your twin has observed. Analysis covers up to the last 14 days of data.
+            </p>
+            {report && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                Last generated: {report.generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })}
+              </p>
+            )}
+          </div>
+
+          {/* Error */}
           {reportError && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
+            <div className="mx-6 mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
               {reportError}
             </div>
           )}
 
-          {report ? (
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl divide-y divide-gray-200 dark:divide-gray-600 text-sm text-gray-700 dark:text-gray-300">
-              {report.content.split('\n').filter((line) => line.trim()).map((line, i) => (
-                <div key={i} className="px-5 py-3 leading-relaxed">
-                  {line}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl px-5 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">
-              No report generated yet.
-            </div>
-          )}
+          {/* Report content */}
+          <div className="border-t border-gray-100 dark:border-gray-700">
+            {report ? (
+              <div className="divide-y divide-gray-100 dark:divide-gray-700 text-sm text-gray-700 dark:text-gray-300">
+                {report.content.split('\n').filter((line) => line.trim()).map((line, i) => (
+                  <div key={i} className="px-6 py-3 leading-relaxed">
+                    {line}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="px-6 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">
+                No report generated yet.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
