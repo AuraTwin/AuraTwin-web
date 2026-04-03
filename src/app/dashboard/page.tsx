@@ -3,24 +3,22 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 import { useAuth } from '@/context/AuthContext';
 import {
   getUserProfile,
   getEmotionLogs,
-  saveReport,
-  getLastReport,
+  addReport,
+  getAllReports,
   UserProfile,
   EmotionLog,
   WellbeingReport,
 } from '@/lib/firestore';
 import { generateWellbeingReport } from '@/lib/gemini';
 import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
+  PieChart, Pie, Cell,
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 
 const EMOTION_COLORS: Record<string, string> = {
@@ -38,24 +36,86 @@ const EMOTION_COLORS: Record<string, string> = {
   Contempt: '#7c3aed',
 };
 
-function formatDate(ts: { toDate: () => Date }): string {
-  return ts.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
 function formatDateTime(ts: { toDate: () => Date }): string {
   return ts.toDate().toLocaleString('en-US', {
-    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
   });
 }
 
 function buildPieData(logs: EmotionLog[]) {
   const counts: Record<string, number> = {};
-  logs.forEach((l) => {
-    counts[l.emotion_label] = (counts[l.emotion_label] ?? 0) + 1;
-  });
+  logs.forEach((l) => { counts[l.emotion_label] = (counts[l.emotion_label] ?? 0) + 1; });
   return Object.entries(counts).map(([name, value]) => ({ name, value }));
 }
 
+function buildLineData(logs: EmotionLog[]) {
+  const byDay = new Map<string, Record<string, number>>();
+  for (const log of logs) {
+    const d = log.timestamp.toDate();
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    if (!byDay.has(iso)) byDay.set(iso, {});
+    const day = byDay.get(iso)!;
+    day[log.emotion_label] = (day[log.emotion_label] ?? 0) + 1;
+  }
+  return Array.from(byDay.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([iso, counts]) => {
+      const d = new Date(iso + 'T12:00:00');
+      return {
+        date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        ...counts,
+      };
+    });
+}
+
+function buildCalendarData(logs: EmotionLog[]) {
+  const today = new Date();
+  return Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (13 - i));
+    const dayLogs = logs.filter((l) => {
+      const ld = l.timestamp.toDate();
+      return ld.getFullYear() === d.getFullYear() &&
+             ld.getMonth() === d.getMonth() &&
+             ld.getDate() === d.getDate();
+    });
+    const counts: Record<string, number> = {};
+    dayLogs.forEach((l) => { counts[l.emotion_label] = (counts[l.emotion_label] ?? 0) + 1; });
+    const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    return {
+      d,
+      dayLabel: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      dateNum: d.getDate(),
+      monthLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      count: dayLogs.length,
+      dominant,
+    };
+  });
+}
+
+/** Minimal markdown → HTML for the PDF print window. */
+function markdownToHtml(md: string): string {
+  const lines = md.split('\n');
+  const out: string[] = [];
+  let inList = false;
+  const bold = (s: string) => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { if (inList) { out.push('</ul>'); inList = false; } continue; }
+    if (line.startsWith('## ')) {
+      if (inList) { out.push('</ul>'); inList = false; }
+      out.push(`<h2>${bold(line.slice(3))}</h2>`);
+    } else if (line.startsWith('- ')) {
+      if (!inList) { out.push('<ul>'); inList = true; }
+      out.push(`<li>${bold(line.slice(2))}</li>`);
+    } else {
+      if (inList) { out.push('</ul>'); inList = false; }
+      out.push(`<p>${bold(line)}</p>`);
+    }
+  }
+  if (inList) out.push('</ul>');
+  return out.join('\n');
+}
 
 function SkeletonDashboard() {
   return (
@@ -98,7 +158,8 @@ export default function DashboardPage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [logs, setLogs] = useState<EmotionLog[]>([]);
-  const [report, setReport] = useState<WellbeingReport | null>(null);
+  const [reports, setReports] = useState<WellbeingReport[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [generatingReport, setGeneratingReport] = useState(false);
   const [reportError, setReportError] = useState('');
   const [copied, setCopied] = useState(false);
@@ -112,11 +173,12 @@ export default function DashboardPage() {
       const [p, l, r] = await Promise.all([
         getUserProfile(uid),
         getEmotionLogs(uid, 14),
-        getLastReport(uid),
+        getAllReports(uid),
       ]);
       setProfile(p);
       setLogs(l);
-      setReport(r);
+      setReports(r);
+      setCurrentIndex(0);
     } catch {
       // silently fail — data simply won't show
     } finally {
@@ -142,18 +204,75 @@ export default function DashboardPage() {
 
   const handleGenerateReport = async () => {
     if (!user) return;
+
+    // Staleness guard: if the latest report is less than 24 hours old, confirm
+    const latest = reports[0];
+    if (latest) {
+      const ageHours = (Date.now() - latest.generated_at.toDate().getTime()) / 3_600_000;
+      if (ageHours < 24) {
+        const confirmed = window.confirm(
+          `Your last report was generated ${Math.round(ageHours * 10) / 10}h ago. Generate a new one anyway?`
+        );
+        if (!confirmed) return;
+      }
+    }
+
     setGeneratingReport(true);
     setReportError('');
     try {
       const freshLogs = await getEmotionLogs(user.uid, 14);
       const content = await generateWellbeingReport(freshLogs);
-      await saveReport(user.uid, content);
-      setReport({ generated_at: { toDate: () => new Date() } as WellbeingReport['generated_at'], content });
+      const id = await addReport(user.uid, content);
+      const newReport: WellbeingReport = {
+        id,
+        generated_at: { toDate: () => new Date() } as WellbeingReport['generated_at'],
+        content,
+      };
+      setReports((prev) => [newReport, ...prev]);
+      setCurrentIndex(0);
     } catch (err: unknown) {
       setReportError(err instanceof Error ? err.message : 'Failed to generate report.');
     } finally {
       setGeneratingReport(false);
     }
+  };
+
+  const handleDownloadPDF = () => {
+    const report = reports[currentIndex];
+    if (!report) return;
+    const dateStr = report.generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'long' });
+    const timeStr = report.generated_at.toDate().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const bodyHtml = markdownToHtml(report.content);
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(`<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>AuraTwin Report — ${dateStr}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111827;padding:48px;max-width:760px;margin:0 auto;font-size:14px;line-height:1.75}
+  .brand{font-size:22px;font-weight:700;color:#0284c7;letter-spacing:-.02em}
+  .meta{color:#6b7280;font-size:12px;margin-top:4px}
+  hr{border:none;border-top:1px solid #e5e7eb;margin:20px 0 28px}
+  h2{font-size:10px;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.12em;margin:28px 0 8px}
+  h2:first-of-type{margin-top:0}
+  p{margin-bottom:14px}
+  ul{padding-left:22px;margin-bottom:14px}
+  li{margin-bottom:7px}
+  strong{font-weight:600}
+  .footer{margin-top:40px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;display:flex;justify-content:space-between}
+  @media print{body{padding:24px}}
+</style></head>
+<body>
+  <div class="brand">AuraTwin</div>
+  <div class="meta">AI-Powered Digital Twin Report &nbsp;·&nbsp; ${dateStr} at ${timeStr}</div>
+  <hr>
+  ${bodyHtml}
+  <div class="footer"><span>AuraTwin Affective Computing Platform</span><span>${dateStr}</span></div>
+</body></html>`);
+    win.document.close();
+    win.focus();
+    setTimeout(() => { win.print(); win.close(); }, 350);
   };
 
   if (loading || dataLoading) return <SkeletonDashboard />;
@@ -178,10 +297,18 @@ export default function DashboardPage() {
     ? lastSessionLog.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     : '--';
   const lastSessionTime = lastSessionLog
-    ? lastSessionLog.timestamp.toDate().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    ? lastSessionLog.timestamp.toDate().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
     : '';
 
+  const daysTracked = new Set(logs.map((l) => {
+    const d = l.timestamp.toDate();
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  })).size;
+
   const pieData = buildPieData(logs);
+  const lineData = buildLineData(logs);
+  const calendarData = buildCalendarData(logs);
+  const lineEmotions = Array.from(new Set(logs.map((l) => l.emotion_label)));
   const displayedLogs = showAllLogs ? [...logs].reverse() : [...logs].reverse().slice(0, 10);
 
   return (
@@ -277,7 +404,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Sessions</p>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalSessions || '--'}</p>
@@ -293,40 +420,136 @@ export default function DashboardPage() {
             <p className="text-3xl font-bold text-gray-900 dark:text-white">{lastSessionDate}</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{lastSessionTime || 'Most recent log'}</p>
           </div>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Days Tracked</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{daysTracked || '--'}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Unique days, last 14</p>
+          </div>
         </div>
 
-        {/* Emotion Distribution */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Emotion Distribution</h2>
-          {pieData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={120}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {pieData.map((entry) => (
-                    <Cell key={entry.name} fill={EMOTION_COLORS[entry.name] ?? '#94a3b8'} />
+        {/* Charts — Emotion Distribution + Trend */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pie */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Emotion Distribution</h2>
+            {pieData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={65} outerRadius={110} paddingAngle={3} dataKey="value">
+                    {pieData.map((entry) => (
+                      <Cell key={entry.name} fill={EMOTION_COLORS[entry.name] ?? '#94a3b8'} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
+                <div className="text-5xl mb-3">📊</div>
+                <p className="font-medium text-gray-600 dark:text-gray-400">No emotion data yet</p>
+                <p className="text-sm mt-2">Start a session with the Windows client to see your emotion distribution.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Line chart */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Emotion Trend</h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Session counts per emotion by day</p>
+            {lineData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={lineData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  {lineEmotions.map((emotion) => (
+                    <Line
+                      key={emotion}
+                      type="monotone"
+                      dataKey={emotion}
+                      stroke={EMOTION_COLORS[emotion] ?? '#94a3b8'}
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                      connectNulls
+                    />
                   ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[300px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
-              <div className="text-5xl mb-3">📊</div>
-              <p className="font-medium text-gray-600 dark:text-gray-400">No emotion data yet</p>
-              <p className="text-sm mt-2">
-                Download the Windows client, enter your App Key, and start a session to see your emotion distribution here.
-              </p>
-            </div>
-          )}
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
+                <div className="text-5xl mb-3">📈</div>
+                <p className="font-medium text-gray-600 dark:text-gray-400">No trend data yet</p>
+                <p className="text-sm mt-2">Emotion trends will appear after multiple days of sessions.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 14-Day Emotion Calendar */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Emotion Calendar</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Dominant emotion per day — last 14 days</p>
+          <div className="grid grid-cols-7 gap-2">
+            {/* Turkish Monday-first headers: Pzt Sal Çar Per Cum Cmt Paz */}
+            {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((d) => (
+              <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 pb-1">
+                {d}
+              </div>
+            ))}
+            {/* Leading empty cells so day 1 lands in the correct column.
+                JS getDay(): 0=Sun … 6=Sat → Monday-first index: (jsDay + 6) % 7 */}
+            {calendarData.length > 0 &&
+              Array.from({ length: (calendarData[0].d.getDay() + 6) % 7 }, (_, i) => (
+                <div key={`empty-${i}`} />
+              ))}
+            {/* Day cells */}
+            {calendarData.map((cell, i) => (
+              <div
+                key={i}
+                title={cell.dominant
+                  ? `${cell.monthLabel} · ${cell.dominant} · ${cell.count} oturum`
+                  : `${cell.monthLabel} · Veri yok`}
+                className="rounded-lg p-2 flex flex-col items-center gap-0.5 border border-gray-100 dark:border-gray-700 cursor-default"
+                style={{
+                  backgroundColor: cell.dominant
+                    ? (EMOTION_COLORS[cell.dominant] ?? '#94a3b8') + '28'
+                    : undefined,
+                }}
+              >
+                <span className={`text-sm font-bold leading-none ${cell.count > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-300 dark:text-gray-600'}`}>
+                  {cell.dateNum}
+                </span>
+                {cell.dominant ? (
+                  <span
+                    className="text-[9px] font-semibold leading-none mt-0.5 truncate w-full text-center"
+                    style={{ color: EMOTION_COLORS[cell.dominant] ?? '#94a3b8' }}
+                  >
+                    {cell.dominant}
+                  </span>
+                ) : (
+                  <span className="text-[9px] text-gray-300 dark:text-gray-600 leading-none mt-0.5">—</span>
+                )}
+                {cell.count > 0 && (
+                  <span className="text-[9px] text-gray-400 dark:text-gray-500 leading-none">{cell.count}</span>
+                )}
+              </div>
+            ))}
+          </div>
+          {/* Legend */}
+          <div className="mt-4 flex flex-wrap gap-3">
+            {Object.entries(EMOTION_COLORS)
+              .filter(([k]) => !['Happy', 'Sad', 'Angry', 'Surprised'].includes(k))
+              .map(([emotion, color]) => (
+                <div key={emotion} className="flex items-center gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{emotion}</span>
+                </div>
+              ))}
+          </div>
         </div>
 
         {/* Emotion Log Table */}
@@ -392,46 +615,127 @@ export default function DashboardPage() {
 
         {/* AI Report Card */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-          {/* Header */}
-          <div className="px-6 py-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Digital Twin Report</h2>
-            <button
-              onClick={handleGenerateReport}
-              disabled={generatingReport}
-              className="shrink-0 px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-60"
-            >
-              {generatingReport ? 'Generating…' : 'Generate Report'}
-            </button>
-          </div>
 
-          {/* Description */}
-          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-              Your digital twin has been silently observing your emotional patterns through every session. Each capture makes its understanding of you deeper and more accurate — the more data it has, the more faithfully it can reflect your inner state. Generate a report to see what your twin has observed. Analysis covers up to the last 14 days of data.
-            </p>
-            {report && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                Last generated: {report.generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })}
-              </p>
-            )}
+          {/* Header */}
+          <div className="px-6 py-4 flex items-center justify-between gap-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              AI-Powered Digital Twin Report
+            </h2>
+            <div className="flex items-center gap-2 shrink-0">
+              {reports.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleDownloadPDF}
+                  title="Download this report as PDF"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download PDF
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleGenerateReport}
+                disabled={generatingReport}
+                className="inline-flex items-center gap-1.5 px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-60"
+              >
+                {generatingReport ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Generating…
+                  </>
+                ) : (
+                  'Generate Report'
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Error */}
           {reportError && (
-            <div className="mx-6 mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
+            <div className="mx-6 mb-2 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
               {reportError}
             </div>
           )}
 
-          {/* Report content */}
+          {/* Report Navigator */}
+          {reports.length > 0 && (
+            <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-2 flex items-center justify-between bg-gray-50 dark:bg-gray-900/40">
+              <button
+                type="button"
+                onClick={() => setCurrentIndex((i) => i - 1)}
+                disabled={currentIndex === 0}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+                Newer
+              </button>
+
+              <div className="text-center text-xs">
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  Report {currentIndex + 1} of {reports.length}
+                </span>
+                <span className="mx-1.5 text-gray-300 dark:text-gray-600">·</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {reports[currentIndex].generated_at.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })}
+                  {' at '}
+                  {reports[currentIndex].generated_at.toDate().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCurrentIndex((i) => i + 1)}
+                disabled={currentIndex === reports.length - 1}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                Older
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* Report content — rendered as Markdown */}
           <div className="border-t border-gray-100 dark:border-gray-700">
-            {report ? (
-              <div className="divide-y divide-gray-100 dark:divide-gray-700 text-sm text-gray-700 dark:text-gray-300">
-                {report.content.split('\n').filter((line) => line.trim()).map((line, i) => (
-                  <div key={i} className="px-6 py-3 leading-relaxed">
-                    {line}
-                  </div>
-                ))}
+            {reports.length > 0 ? (
+              <div className="px-6 py-6">
+                <ReactMarkdown
+                  components={{
+                    h2: ({ children }) => (
+                      <h2 className="text-xs font-bold text-primary-600 dark:text-primary-400 mt-6 mb-2 first:mt-0 uppercase tracking-widest">
+                        {children}
+                      </h2>
+                    ),
+                    p: ({ children }) => (
+                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                        {children}
+                      </p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="mt-1 mb-0 space-y-2 list-none pl-0">{children}</ul>
+                    ),
+                    li: ({ children }) => (
+                      <li className="flex gap-2.5 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500" />
+                        <span>{children}</span>
+                      </li>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className="font-semibold text-gray-900 dark:text-white">{children}</strong>
+                    ),
+                  }}
+                >
+                  {reports[currentIndex].content}
+                </ReactMarkdown>
               </div>
             ) : (
               <div className="px-6 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">

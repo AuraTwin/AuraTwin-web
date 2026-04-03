@@ -7,6 +7,7 @@ import {
   orderBy,
   getDocs,
   setDoc,
+  addDoc,
   Timestamp,
 } from 'firebase/firestore';
 import { db as _db } from './firebase';
@@ -31,6 +32,7 @@ export interface UserProfile {
 }
 
 export interface WellbeingReport {
+  id: string;
   generated_at: Timestamp;
   content: string;
 }
@@ -61,18 +63,22 @@ export async function getEmotionLogs(uid: string, days = 14): Promise<EmotionLog
   return snap.docs.map((d) => d.data() as EmotionLog);
 }
 
-export async function saveReport(uid: string, content: string): Promise<void> {
-  const docRef = doc(db, 'users', uid, 'last_report', 'data');
-  await setDoc(docRef, {
+/** Adds a new report document to the user's reports subcollection. Returns the new doc ID. */
+export async function addReport(uid: string, content: string): Promise<string> {
+  const colRef = collection(db, 'users', uid, 'reports');
+  const docRef = await addDoc(colRef, {
     generated_at: Timestamp.now(),
     content,
   });
+  return docRef.id;
 }
 
-export async function getLastReport(uid: string): Promise<WellbeingReport | null> {
-  const docRef = doc(db, 'users', uid, 'last_report', 'data');
-  const snap = await getDoc(docRef);
-  return snap.exists() ? (snap.data() as WellbeingReport) : null;
+/** Returns all reports for the user, newest first. */
+export async function getAllReports(uid: string): Promise<WellbeingReport[]> {
+  const colRef = collection(db, 'users', uid, 'reports');
+  const q = query(colRef, orderBy('generated_at', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as WellbeingReport));
 }
 
 /*
@@ -82,7 +88,7 @@ export async function getLastReport(uid: string): Promise<WellbeingReport | null
  *
  * users/{uid}/
  *   profile/data                   → { name, surname, email, app_key, created_at }
- *   last_report/data               → { generated_at, content }
+ *   reports/{autoId}               → { generated_at, content }
  *   emotions/{autoId}              → { timestamp, emotion_label, confidence_score }
  *                                     ↑ written by AWS via Firebase Admin SDK
  */
