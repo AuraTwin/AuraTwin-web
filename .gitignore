@@ -145,3 +145,5 @@ teknik_dokuman.txt
 AuraTwin_logo.png
 AuraTwin_logo_circle.png
 favicon_set_auratwin/
+serviceAccount.json
+scripts/seed-emotions.js

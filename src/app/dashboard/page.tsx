@@ -93,6 +93,26 @@ function buildCalendarData(logs: EmotionLog[]) {
   });
 }
 
+/** Extracts one summary sentence per ## section from a markdown report. */
+function buildTldr(content: string): { heading: string; sentence: string }[] {
+  const sections: { heading: string; sentence: string }[] = [];
+  let heading: string | null = null;
+  let captured = false;
+  for (const raw of content.split('\n')) {
+    const line = raw.trim();
+    if (line.startsWith('## ')) {
+      heading = line.slice(3);
+      captured = false;
+    } else if (heading && !captured && line && !line.startsWith('#') && !line.startsWith('-')) {
+      const match = line.match(/^(.+?[.!?])(?:\s|$)/);
+      const sentence = match ? match[1] : line.length > 130 ? line.slice(0, 130) + '…' : line;
+      sections.push({ heading, sentence });
+      captured = true;
+    }
+  }
+  return sections;
+}
+
 /** Minimal markdown → HTML for the PDF print window. */
 function markdownToHtml(md: string): string {
   const lines = md.split('\n');
@@ -163,6 +183,8 @@ export default function DashboardPage() {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [reportError, setReportError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [reportStaleWarning, setReportStaleWarning] = useState(false);
+  const [showTldr, setShowTldr] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [showAllLogs, setShowAllLogs] = useState(false);
   const [appKeyExpanded, setAppKeyExpanded] = useState(false);
@@ -202,21 +224,20 @@ export default function DashboardPage() {
     }
   };
 
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = async (force = false) => {
     if (!user) return;
 
-    // Staleness guard: if the latest report is less than 24 hours old, confirm
+    // Staleness guard: if the latest report is less than 24 hours old, show inline warning
     const latest = reports[0];
-    if (latest) {
+    if (!force && latest) {
       const ageHours = (Date.now() - latest.generated_at.toDate().getTime()) / 3_600_000;
       if (ageHours < 24) {
-        const confirmed = window.confirm(
-          `Your last report was generated ${Math.round(ageHours * 10) / 10}h ago. Generate a new one anyway?`
-        );
-        if (!confirmed) return;
+        setReportStaleWarning(true);
+        return;
       }
     }
 
+    setReportStaleWarning(false);
     setGeneratingReport(true);
     setReportError('');
     try {
@@ -494,8 +515,7 @@ export default function DashboardPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Emotion Calendar</h2>
           <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Dominant emotion per day — last 14 days</p>
           <div className="grid grid-cols-7 gap-2">
-            {/* Turkish Monday-first headers: Pzt Sal Çar Per Cum Cmt Paz */}
-            {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((d) => (
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
               <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 pb-1">
                 {d}
               </div>
@@ -511,8 +531,8 @@ export default function DashboardPage() {
               <div
                 key={i}
                 title={cell.dominant
-                  ? `${cell.monthLabel} · ${cell.dominant} · ${cell.count} oturum`
-                  : `${cell.monthLabel} · Veri yok`}
+                  ? `${cell.monthLabel} · ${cell.dominant} · ${cell.count} session${cell.count !== 1 ? 's' : ''}`
+                  : `${cell.monthLabel} · No data`}
                 className="rounded-lg p-2 flex flex-col items-center gap-0.5 border border-gray-100 dark:border-gray-700 cursor-default"
                 style={{
                   backgroundColor: cell.dominant
@@ -623,21 +643,38 @@ export default function DashboardPage() {
             </h2>
             <div className="flex items-center gap-2 shrink-0">
               {reports.length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleDownloadPDF}
-                  title="Download this report as PDF"
-                  className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download PDF
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowTldr((v) => !v)}
+                    title="Show a one-sentence summary of each section"
+                    className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                      showTldr
+                        ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    TL;DR
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadPDF}
+                    title="Download this report as PDF"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download PDF
+                  </button>
+                </>
               )}
               <button
                 type="button"
-                onClick={handleGenerateReport}
+                onClick={() => handleGenerateReport()}
                 disabled={generatingReport}
                 className="inline-flex items-center gap-1.5 px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-60"
               >
@@ -655,6 +692,37 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
+
+          {/* Staleness warning */}
+          {reportStaleWarning && !generatingReport && (
+            <div className="mx-6 mb-2 flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl">
+              <svg className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              </svg>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Report generated recently</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                  Your last report is less than 24 hours old. Generating a new one will use additional API credits.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setReportStaleWarning(false)}
+                  className="px-3 py-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-800/40 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleGenerateReport(true)}
+                  className="px-3 py-1.5 text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition-colors"
+                >
+                  Generate anyway
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Error */}
           {reportError && (
@@ -703,6 +771,32 @@ export default function DashboardPage() {
               </button>
             </div>
           )}
+
+          {/* TL;DR panel */}
+          {showTldr && reports.length > 0 && (() => {
+            const tldr = buildTldr(reports[currentIndex].content);
+            return tldr.length > 0 ? (
+              <div className="border-t border-gray-100 dark:border-gray-700 px-6 py-5 bg-primary-50/60 dark:bg-primary-900/10">
+                <p className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-3">TL;DR — Quick Summary</p>
+                <div className="space-y-2.5">
+                  {tldr.map(({ heading, sentence }) => (
+                    <div key={heading} className="flex gap-4 items-baseline">
+                      <span className="shrink-0 text-[10px] font-bold text-primary-500 dark:text-primary-400 uppercase tracking-wide w-36 leading-snug pt-px">
+                        {heading}
+                      </span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        {sentence.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
+                          part.startsWith('**') && part.endsWith('**')
+                            ? <strong key={i} className="font-semibold text-gray-900 dark:text-white">{part.slice(2, -2)}</strong>
+                            : part
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
 
           {/* Report content — rendered as Markdown */}
           <div className="border-t border-gray-100 dark:border-gray-700">
