@@ -45,10 +45,10 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {[
-              { name: 'Ali Haktan Sığın', role: 'Project Leader & Full Stack Developer', description: 'Led the project and developed the website, dashboard, and Firebase integration (Authentication & Firestore).' },
+              { name: 'Ali Haktan Sığın', role: 'Leader & Full Stack Developer', description: 'Led the project and developed the web platform, Firebase backend, and supported the desktop client.' },
               { name: 'Ahmet Özgür Korkmaz', role: 'Cloud Infrastructure Engineer', description: 'Managed AWS virtual server setup and deployment of the backend Python application.' },
-              { name: 'Utku Derici', role: 'Desktop Client Developer', description: 'Developed and tested the desktop client application (macOS & Windows) and handled integration.' },
-              { name: 'Yiğit Emre Çay', role: 'QA Engineer & Support', description: 'Conducted comprehensive system testing and provided technical assistance throughout development.' },
+              { name: 'Utku Derici', role: 'Desktop Client Developer', description: 'Developed and tested the desktop client application and handled integration.' },
+              { name: 'Yiğit Emre Çay', role: 'QA Engineer & Support', description: 'Conducted comprehensive system testing, helped documentation and development.' },
             ].map((member, i) => (
               <div key={member.name} className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-reveal data-reveal-delay={`${i * 80}`}>
                 <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full mx-auto mb-4 flex items-center justify-center">
