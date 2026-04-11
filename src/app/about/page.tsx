@@ -47,7 +47,7 @@ export default function AboutPage() {
             {[
               { name: 'Ali Haktan Sığın', role: 'Project Leader & Full Stack Developer', description: 'Led the project and developed the website, dashboard, and Firebase integration (Authentication & Firestore).' },
               { name: 'Ahmet Özgür Korkmaz', role: 'Cloud Infrastructure Engineer', description: 'Managed AWS virtual server setup and deployment of the backend Python application.' },
-              { name: 'Utku Derici', role: 'Windows Client Developer', description: 'Developed and tested the Windows desktop client application and handled integration.' },
+              { name: 'Utku Derici', role: 'Desktop Client Developer', description: 'Developed and tested the desktop client application (macOS & Windows) and handled integration.' },
               { name: 'Yiğit Emre Çay', role: 'QA Engineer & Support', description: 'Conducted comprehensive system testing and provided technical assistance throughout development.' },
             ].map((member, i) => (
               <div key={member.name} className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-reveal data-reveal-delay={`${i * 80}`}>
@@ -147,8 +147,8 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-20 bg-gradient-to-br from-primary-600 to-accent-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
-          <h2 className="text-4xl font-bold mb-6">Join Us on This Journey</h2>
-          <p className="text-xl text-primary-100 mb-8">Be part of the future of emotional well-being and self-awareness.</p>
+          <h2 className="text-4xl font-bold mb-6">Try AuraTwin</h2>
+          <p className="text-xl text-primary-100 mb-8">Create an account and start understanding your emotional patterns today.</p>
           <a href="/login" className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
             Create an Account
           </a>

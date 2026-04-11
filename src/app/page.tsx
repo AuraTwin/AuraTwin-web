@@ -11,18 +11,18 @@ export default function Home() {
               Understand Your Emotions.
               <br />
               <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-                Transform Your Well-being.
+                Know Your Well-being.
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto animate-fadeIn">
-              AuraTwin creates your personal affective digital twin, helping you recognize emotional patterns and build better self-awareness through privacy-first technology.
+              AuraTwin builds your personal affective digital twin — recognizing your emotional patterns and giving you clear, AI-powered insights into your well-being.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fadeIn">
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-all transform hover:scale-105 shadow-lg"
               >
-                Get Started Free
+                Get Started
               </Link>
               <Link
                 href="/product"
@@ -36,20 +36,23 @@ export default function Home() {
           {/* Visual Element */}
           <div className="mt-16 relative" data-reveal>
             <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['Happy', 'Calm', 'Focused', 'Energized'].map((emotion, index) => (
+              <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+                {[
+                  { label: 'Happy', emoji: '😊' },
+                  { label: 'Sad', emoji: '😢' },
+                  { label: 'Angry', emoji: '😠' },
+                  { label: 'Surprised', emoji: '😮' },
+                  { label: 'Neutral', emoji: '😐' },
+                  { label: 'Fear', emoji: '😨' },
+                  { label: 'Disgust', emoji: '🤢' },
+                  { label: 'Contempt', emoji: '😒' },
+                ].map((emotion) => (
                   <div
-                    key={emotion}
-                    className="text-center p-6 bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-700 dark:to-gray-700 rounded-xl"
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    key={emotion.label}
+                    className="text-center p-4 bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-700 dark:to-gray-700 rounded-xl"
                   >
-                    <div className="text-4xl mb-2">
-                      {emotion === 'Happy' && '😊'}
-                      {emotion === 'Calm' && '😌'}
-                      {emotion === 'Focused' && '🎯'}
-                      {emotion === 'Energized' && '⚡'}
-                    </div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{emotion}</p>
+                    <div className="text-3xl mb-2">{emotion.emoji}</div>
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{emotion.label}</p>
                   </div>
                 ))}
               </div>
@@ -63,10 +66,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16" data-reveal>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Your Personal Emotional Intelligence Assistant
+              Your Personal Well-being Assistant
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              AuraTwin combines cutting-edge AI with privacy-first design to help you understand and improve your emotional well-being.
+              AuraTwin uses AI and facial expression analysis to help you understand your emotional patterns — without ever storing your face.
             </p>
           </div>
 
@@ -80,7 +83,7 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Continuous Monitoring</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Real-time facial expression analysis captures your emotional state throughout the day, building a comprehensive emotional profile.
+                The desktop client runs quietly in the background, capturing your emotional state at regular intervals throughout the day.
               </p>
             </div>
 
@@ -92,7 +95,7 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Pattern Recognition</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Advanced AI identifies emotional trends over time, helping you understand what triggers different emotional states.
+                AI identifies your emotional trends over days and weeks, helping you see what times, days, or situations affect your mood.
               </p>
             </div>
 
@@ -102,9 +105,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Privacy Guarantee</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Privacy by Design</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Your facial images are immediately deleted after processing. Only anonymized emotional metadata is stored locally and encrypted.
+                Facial images are deleted immediately after analysis. Only the emotion label and confidence score are stored — never your photo.
               </p>
             </div>
           </div>
@@ -119,7 +122,7 @@ export default function Home() {
               How AuraTwin Works
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Three simple steps to unlock your emotional insights
+              Three steps to understand your emotional patterns
             </p>
           </div>
 
@@ -127,9 +130,9 @@ export default function Home() {
             <div className="relative" data-reveal data-reveal-delay="0">
               <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 mx-auto">1</div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">Download & Install</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">Download & Connect</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-center">
-                  Download and install the AuraTwin Windows desktop client. Enter your App Key from the dashboard to link your account — setup takes less than 2 minutes.
+                  Download the AuraTwin desktop client (macOS or Windows). Enter your App Key from the dashboard to link your account — setup takes under 2 minutes.
                 </p>
               </div>
             </div>
@@ -137,9 +140,9 @@ export default function Home() {
             <div className="relative" data-reveal data-reveal-delay="120">
               <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="w-16 h-16 bg-accent-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 mx-auto">2</div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">Let It Learn</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">Work Normally</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-center">
-                  AuraTwin quietly monitors your facial expressions as you work, capturing emotional data throughout your day.
+                  AuraTwin runs silently in your system tray, capturing a brief camera frame every few minutes and sending only the emotion result to the cloud.
                 </p>
               </div>
             </div>
@@ -147,9 +150,9 @@ export default function Home() {
             <div className="relative" data-reveal data-reveal-delay="240">
               <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="w-16 h-16 bg-warm-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 mx-auto">3</div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">Gain Insights</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 text-center">Read Your Report</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-center">
-                  Review your emotional patterns, discover triggers, and receive personalized recommendations for better well-being.
+                  Open your dashboard to see charts, trends, and a personalized AI well-being report generated from your last 14 days of data.
                 </p>
               </div>
             </div>
@@ -157,22 +160,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust & Privacy Section */}
+      {/* Privacy Section */}
       <section className="py-20 bg-gradient-to-br from-primary-900 to-accent-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16" data-reveal>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Your Privacy Is Non-Negotiable</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Built Around Your Privacy</h2>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto">
-              We built AuraTwin with privacy as the foundation, not an afterthought.
+              Privacy is not a feature we added at the end — it is part of the core design.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {[
-              { title: 'Immediate Image Deletion', body: 'Your facial images are processed and immediately deleted. We never store your face.' },
-              { title: 'Local-First Architecture', body: 'All your data is stored locally on your device, encrypted and under your control.' },
-              { title: 'Military-Grade Encryption', body: 'All data transmission uses TLS 1.3 and AES-256-GCM encryption standards.' },
-              { title: 'GDPR Compliant', body: 'Built to meet the strictest international privacy regulations from day one.' },
+              { title: 'Images Deleted Immediately', body: 'Your camera frame is analyzed on the server and deleted from memory right away. No photo is ever saved to disk.' },
+              { title: 'Minimal Data Stored', body: 'Only the emotion label, confidence score, and timestamp are stored in the cloud — nothing that can identify you visually.' },
+              { title: 'Encrypted Transmission', body: 'All data between the desktop client and the server is sent over HTTPS. Your App Key authenticates each request.' },
+              { title: 'You Control the Analysis', body: 'The AI report is generated only when you press the button. Nothing runs without your action.' },
             ].map((item, i) => (
               <div key={item.title} className="flex items-start space-x-4" data-reveal data-reveal-delay={`${i * 80}`}>
                 <div className="flex-shrink-0">
@@ -197,17 +200,14 @@ export default function Home() {
             Ready to Meet Your Digital Twin?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-            Join our beta program and be among the first to experience personalized emotional intelligence.
+            Create an account, get your App Key, and start understanding your emotional patterns.
           </p>
           <Link
             href="/login"
             className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-all transform hover:scale-105 shadow-lg"
           >
-            Create Free Account
+            Create an Account
           </Link>
-          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            No credit card required. Launching Q2 2026.
-          </p>
         </div>
       </section>
     </div>

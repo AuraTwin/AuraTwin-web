@@ -140,14 +140,14 @@ export default function ProductPage() {
             <div className="bg-gradient-to-br from-accent-50 to-white dark:from-gray-800 dark:to-gray-800 p-8 rounded-2xl border border-accent-100 dark:border-gray-700" data-reveal data-reveal-delay="150">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Hybrid Architecture</h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                AuraTwin uses a four-tier hybrid architecture: a Python desktop client, an AWS FastAPI server with OpenCV DNN face detection, Firebase Firestore for data persistence, and a Gemini AI-powered web dashboard.
+                AuraTwin uses a four-tier hybrid architecture: a Python desktop client, an AWS FastAPI server for emotion analysis, Firebase Firestore for data storage, and a Gemini AI-powered web dashboard.
               </p>
               <div className="space-y-3">
                 {[
-                  { step: '1', label: 'Windows Client', desc: 'Python desktop app captures facial expressions via webcam and sends data to the server using your App Key.' },
-                  { step: '2', label: 'AWS FastAPI Server', desc: 'Uses OpenCV DNN and enet_b0 models to process emotions efficiently on t2.micro instances.' },
+                  { step: '1', label: 'Desktop Client', desc: 'Python app (macOS & Windows) captures facial expressions via webcam and sends data to the server using your App Key.' },
+                  { step: '2', label: 'AWS FastAPI Server', desc: 'Runs the emotion recognition model on an EC2 instance, then writes results to Firestore.' },
                   { step: '3', label: 'Firebase Firestore', desc: 'Stores emotion logs securely in the cloud, linked to your account.' },
-                  { step: '4', label: 'Web Dashboard + Gemini AI', desc: 'Displays charts and generates AI well-being reports using Gemini 2.0 Flash.' },
+                  { step: '4', label: 'Web Dashboard + Gemini', desc: 'Displays charts and generates personalized AI well-being reports using Gemini 3.1 Flash Lite.' },
                 ].map((item) => (
                   <div key={item.step} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-accent-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
@@ -172,9 +172,9 @@ export default function ProductPage() {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">System Requirements</h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Minimum Requirements</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Supported Platforms</h3>
                 <ul className="space-y-3">
-                  {['Windows 10 or 11', 'Webcam (720p or higher)', '4GB RAM', '500MB free disk space', 'Internet connection'].map((item) => (
+                  {['Windows 10 or 11', 'macOS 12 (Monterey) or later', 'Built-in or external webcam (720p or higher)', '4 GB RAM minimum', 'Internet connection'].map((item) => (
                     <li key={item} className="flex items-start">
                       <svg className="w-5 h-5 text-primary-600 mr-2 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -187,7 +187,7 @@ export default function ProductPage() {
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Recommended</h3>
                 <ul className="space-y-3">
-                  {['Windows 11', 'HD Webcam (1080p)', '8GB RAM or more', 'SSD storage', 'Stable broadband connection'].map((item) => (
+                  {['Windows 11 or macOS 13+', 'HD Webcam (1080p)', '8 GB RAM or more', 'SSD storage', 'Stable broadband connection'].map((item) => (
                     <li key={item} className="flex items-start">
                       <svg className="w-5 h-5 text-accent-600 mr-2 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -207,7 +207,7 @@ export default function ProductPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
           <h2 className="text-4xl font-bold text-white mb-6">Ready to Experience AuraTwin?</h2>
           <p className="text-xl text-primary-100 mb-8">
-            Join our beta program and start your journey to better emotional awareness.
+            Create an account, get your App Key, and start your journey to better emotional awareness.
           </p>
           <Link
             href="/login"

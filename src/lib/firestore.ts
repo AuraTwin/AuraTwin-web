@@ -8,6 +8,7 @@ import {
   getDocs,
   setDoc,
   addDoc,
+  deleteDoc,
   Timestamp,
 } from 'firebase/firestore';
 import { db as _db } from './firebase';
@@ -79,6 +80,24 @@ export async function getAllReports(uid: string): Promise<WellbeingReport[]> {
   const q = query(colRef, orderBy('generated_at', 'desc'));
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as WellbeingReport));
+}
+
+/**
+ * Generates a new App Key, writes it to app_keys/{newKey} and updates the
+ * user profile — then deletes the old app_keys entry.
+ * Order matters: new key is live before old one is deleted, so there is no
+ * window where neither key exists.
+ */
+export async function rotateAppKey(uid: string, oldKey: string): Promise<string> {
+  const uuid = crypto.randomUUID().replace(/-/g, '').toUpperCase();
+  const newKey = `ATV-${uuid.slice(0, 4)}-${uuid.slice(4, 8)}`;
+  const now = Timestamp.now();
+
+  await setDoc(doc(db, 'app_keys', newKey), { uid, created_at: now });
+  await setDoc(doc(db, 'users', uid, 'profile', 'data'), { app_key: newKey }, { merge: true });
+  await deleteDoc(doc(db, 'app_keys', oldKey));
+
+  return newKey;
 }
 
 /*

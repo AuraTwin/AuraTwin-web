@@ -10,6 +10,7 @@ import {
   getEmotionLogs,
   addReport,
   getAllReports,
+  rotateAppKey,
   UserProfile,
   EmotionLog,
   WellbeingReport,
@@ -183,6 +184,8 @@ export default function DashboardPage() {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [reportError, setReportError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [randomizing, setRandomizing] = useState(false);
+  const [showRotateModal, setShowRotateModal] = useState(false);
   const [reportStaleWarning, setReportStaleWarning] = useState(false);
   const [showTldr, setShowTldr] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
@@ -222,6 +225,25 @@ export default function DashboardPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleRandomize = async () => {
+    if (!user || !profile?.app_key) return;
+    setShowRotateModal(false);
+    setRandomizing(true);
+    try {
+      await rotateAppKey(user.uid, profile.app_key);
+    } catch {
+      // rotateAppKey may throw on deleteDoc (security rules) even after the
+      // new key is already written — fall through and re-fetch either way.
+    }
+    try {
+      const fresh = await getUserProfile(user.uid);
+      if (fresh) setProfile(fresh);
+    } catch {
+      // ignore
+    }
+    setRandomizing(false);
   };
 
   const handleGenerateReport = async (force = false) => {
@@ -334,6 +356,42 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+
+      {/* App Key Rotate Modal */}
+      {showRotateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-sm w-full p-6">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Randomize App Key?</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Your current key will be replaced with a new one. The desktop client will stop sending data until you enter the new key in its settings.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowRotateModal(false)}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRandomize}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                Generate New Key
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -384,7 +442,7 @@ export default function DashboardPage() {
               {/* Left: App Key */}
               <div className="px-6 py-5 flex flex-col justify-center gap-3">
                 <p className="text-primary-100 text-sm">
-                  Enter this key in the AuraTwin Windows client to link your account
+                  Enter this key in the AuraTwin desktop client to link your account
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="font-mono text-2xl font-bold tracking-widest">
@@ -395,17 +453,24 @@ export default function DashboardPage() {
                     disabled={!profile?.app_key}
                     className="shrink-0 px-5 py-2 bg-white text-primary-600 text-sm font-semibold rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
                   >
-                    {copied ? 'Copied!' : 'Copy to Clipboard'}
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                  <button
+                    onClick={() => setShowRotateModal(true)}
+                    disabled={!profile?.app_key || randomizing}
+                    className="shrink-0 px-5 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-semibold rounded-lg border border-white/30 transition-colors disabled:opacity-50"
+                  >
+                    {randomizing ? 'Updating…' : 'Randomize'}
                   </button>
                 </div>
               </div>
 
-              {/* Right: Windows Client */}
+              {/* Right: Desktop Client */}
               <div className="px-6 py-5 flex flex-col justify-center gap-3 sm:border-l border-t sm:border-t-0 border-white/20">
                 <div>
-                  <p className="text-sm font-semibold">Windows Client</p>
+                  <p className="text-sm font-semibold">Desktop Client</p>
                   <p className="text-primary-100 text-xs mt-1">
-                    Download the AuraTwin desktop app, enter your App Key, and start tracking your emotions.
+                    Download the AuraTwin desktop app (macOS & Windows), enter your App Key, and start tracking your emotions.
                   </p>
                 </div>
                 <a
@@ -469,7 +534,7 @@ export default function DashboardPage() {
               <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
                 <div className="text-5xl mb-3">📊</div>
                 <p className="font-medium text-gray-600 dark:text-gray-400">No emotion data yet</p>
-                <p className="text-sm mt-2">Start a session with the Windows client to see your emotion distribution.</p>
+                <p className="text-sm mt-2">Start a session with the desktop client to see your emotion distribution.</p>
               </div>
             )}
           </div>
@@ -628,7 +693,7 @@ export default function DashboardPage() {
           ) : (
             <div className="px-6 py-12 text-center text-gray-400 dark:text-gray-500">
               <p className="font-medium text-gray-600 dark:text-gray-400 mb-1">No sessions recorded yet</p>
-              <p className="text-sm">Sessions will appear here after you use the Windows client.</p>
+              <p className="text-sm">Sessions will appear here after you use the desktop client.</p>
             </div>
           )}
         </div>

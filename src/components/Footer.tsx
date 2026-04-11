@@ -52,7 +52,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="text-sm hover:text-white transition-colors"
                 >
-                  Download Client
+                  Download Desktop Client
                 </a>
               </li>
             </ul>

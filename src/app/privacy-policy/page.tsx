@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
           <section className="mb-10">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. Processing & Storage</h2>
             <p className="text-gray-700 dark:text-gray-300">
-              <strong>Facial images are never stored.</strong> All image processing occurs in real-time and images are immediately deleted. Only anonymized emotional metadata (e.g., "Happy: 80%") is stored. This data is kept locally on your device or encrypted in our secure database for your dashboard access.
+              <strong>Facial images are never stored.</strong> All image processing occurs in real-time on our server and images are deleted from memory immediately after analysis. Only anonymized emotional metadata (e.g., "Happy: 80%") is stored — this data is saved securely in the cloud (Firebase Firestore) and is only accessible through your account.
             </p>
           </section>
 

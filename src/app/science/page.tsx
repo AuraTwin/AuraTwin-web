@@ -72,20 +72,20 @@ export default function SciencePage() {
           </div>
 
           <div className="space-y-12">
-            {/* FER-2013 Dataset */}
+            {/* AffectNet Dataset */}
             <div className="bg-white dark:bg-gray-900 p-8 md:p-12 rounded-2xl shadow-lg" data-reveal>
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">FER-2013 Dataset</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">AffectNet Dataset</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Our emotion recognition model is trained on the FER-2013 (Facial Expression Recognition 2013) dataset, one of the most widely used benchmarks in emotion recognition research.
+                    The emotion recognition model used in AuraTwin is trained on AffectNet, one of the largest real-world facial expression datasets available. It covers a wide range of people, lighting conditions, and environments.
                   </p>
                   <ul className="space-y-3">
                     {[
-                      <><strong>35,887 grayscale images</strong> of facial expressions</>,
-                      <><strong>8 emotion categories</strong> (Happy, Sad, Angry, Surprised, Neutral, Fear, Disgust, Contempt)</>,
-                      <><strong>Diverse demographics</strong> ensuring model generalization</>,
-                      <><strong>Real-world conditions</strong> including varying lighting and angles</>,
+                      <><strong>~450,000 real-world images</strong> collected from the internet</>,
+                      <><strong>8 emotion categories:</strong> Happy, Sad, Angry, Surprised, Neutral, Fear, Disgust, Contempt</>,
+                      <><strong>Natural, uncontrolled conditions</strong> — not posed or staged</>,
+                      <><strong>High visual diversity</strong> across demographics, angles, and lighting</>,
                     ].map((item, i) => (
                       <li key={i} className="flex items-start">
                         <span className="text-primary-600 mr-2 font-bold">•</span>
@@ -96,26 +96,21 @@ export default function SciencePage() {
                 </div>
                 <div className="bg-gradient-to-br from-primary-100 to-accent-100 dark:from-gray-700 dark:to-gray-700 p-8 rounded-xl">
                   <div className="bg-white dark:bg-gray-800 p-6 rounded-lg">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Dataset Distribution</h4>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">8 Detected Emotions</h4>
                     <div className="space-y-2">
                       {[
-                        { emotion: 'Happy', percentage: '24%', width: 24 },
-                        { emotion: 'Neutral', percentage: '22%', width: 22 },
-                        { emotion: 'Sad', percentage: '18%', width: 18 },
-                        { emotion: 'Angry', percentage: '14%', width: 14 },
-                        { emotion: 'Surprised', percentage: '12%', width: 12 },
-                        { emotion: 'Fear', percentage: '6%', width: 6 },
-                        { emotion: 'Disgust', percentage: '3%', width: 3 },
-                        { emotion: 'Contempt', percentage: '1%', width: 1 },
+                        { emotion: 'Happy', emoji: '😊' },
+                        { emotion: 'Neutral', emoji: '😐' },
+                        { emotion: 'Sad', emoji: '😢' },
+                        { emotion: 'Angry', emoji: '😠' },
+                        { emotion: 'Surprised', emoji: '😮' },
+                        { emotion: 'Fear', emoji: '😨' },
+                        { emotion: 'Disgust', emoji: '🤢' },
+                        { emotion: 'Contempt', emoji: '😒' },
                       ].map((item) => (
-                        <div key={item.emotion} className="flex justify-between items-center">
-                          <span className="text-gray-700 dark:text-gray-300">{item.emotion}</span>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                              <div className="bg-primary-600 h-2 rounded-full" style={{ width: item.percentage }} />
-                            </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400 w-12 text-right">{item.percentage}</span>
-                          </div>
+                        <div key={item.emotion} className="flex items-center gap-3 py-1">
+                          <span className="text-xl w-7 text-center">{item.emoji}</span>
+                          <span className="text-gray-700 dark:text-gray-300 text-sm font-medium">{item.emotion}</span>
                         </div>
                       ))}
                     </div>
@@ -239,7 +234,7 @@ export default function SciencePage() {
       <section className="py-20 bg-gradient-to-br from-primary-600 to-accent-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
           <h2 className="text-4xl font-bold mb-6">Experience Science-Backed Emotional Intelligence</h2>
-          <p className="text-xl text-primary-100 mb-8">Join our beta program and be part of the future of emotional well-being.</p>
+          <p className="text-xl text-primary-100 mb-8">Create an account and start tracking your emotional patterns with AI.</p>
           <a href="/login" className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
             Get Started
           </a>
