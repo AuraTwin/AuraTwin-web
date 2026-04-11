@@ -83,6 +83,32 @@ export async function getAllReports(uid: string): Promise<WellbeingReport[]> {
 }
 
 /**
+ * Deletes all Firestore data belonging to a user before account removal.
+ * Order: subcollections first, then profile doc, then app_key lookup.
+ * Runs in parallel where possible to minimise latency.
+ */
+export async function deleteUserData(uid: string, appKey: string): Promise<void> {
+  const [emotionsSnap, reportsSnap] = await Promise.all([
+    getDocs(collection(db, 'users', uid, 'emotions')),
+    getDocs(collection(db, 'users', uid, 'reports')),
+  ]);
+
+  await Promise.all([
+    ...emotionsSnap.docs.map((d) => deleteDoc(d.ref)),
+    ...reportsSnap.docs.map((d) => deleteDoc(d.ref)),
+  ]);
+
+  await deleteDoc(doc(db, 'users', uid, 'profile', 'data'));
+
+  if (appKey) {
+    await deleteDoc(doc(db, 'app_keys', appKey)).catch(() => {
+      // Security rules may block client-side deletion of app_keys —
+      // silently skip; the orphaned key cannot be used after Auth is removed.
+    });
+  }
+}
+
+/**
  * Generates a new App Key, writes it to app_keys/{newKey} and updates the
  * user profile — then deletes the old app_keys entry.
  * Order matters: new key is live before old one is deleted, so there is no

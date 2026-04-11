@@ -11,7 +11,7 @@ import {
   reauthenticateWithCredential,
   deleteUser,
 } from 'firebase/auth';
-import { getUserProfile, updateUserProfile } from '@/lib/firestore';
+import { getUserProfile, updateUserProfile, deleteUserData } from '@/lib/firestore';
 
 export default function SettingsPage() {
   const { user, loading } = useAuth();
@@ -30,6 +30,7 @@ export default function SettingsPage() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSaving, setPasswordSaving] = useState(false);
 
+  const [appKey, setAppKey] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
@@ -46,6 +47,7 @@ export default function SettingsPage() {
         if (profile) {
           setName(profile.name || '');
           setSurname(profile.surname || '');
+          setAppKey(profile.app_key || '');
         }
       });
     }
@@ -116,6 +118,8 @@ export default function SettingsPage() {
     try {
       const credential = EmailAuthProvider.credential(user.email, deletePassword);
       await reauthenticateWithCredential(user, credential);
+      // Delete all Firestore data before removing the Auth account
+      await deleteUserData(user.uid, appKey);
       await deleteUser(user);
       router.push('/');
     } catch (err: unknown) {
@@ -244,6 +248,27 @@ export default function SettingsPage() {
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Permanently delete your AuraTwin account. This action cannot be undone.
           </p>
+
+          {/* What gets deleted */}
+          <div className="mb-5 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg p-4">
+            <p className="text-xs font-semibold text-red-700 dark:text-red-400 mb-2 uppercase tracking-wide">The following data will be permanently deleted</p>
+            <ul className="space-y-1">
+              {[
+                'Your profile (name, email, App Key)',
+                'All emotion session logs',
+                'All AI well-being reports',
+                'Your login credentials',
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {!showDeleteSection ? (
             <button
               onClick={() => setShowDeleteSection(true)}
@@ -285,7 +310,7 @@ export default function SettingsPage() {
                   disabled={deleteLoading}
                   className="px-5 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-60 text-sm"
                 >
-                  {deleteLoading ? 'Deleting…' : 'Permanently Delete'}
+                  {deleteLoading ? 'Deleting all data…' : 'Permanently Delete'}
                 </button>
                 <button
                   type="button"

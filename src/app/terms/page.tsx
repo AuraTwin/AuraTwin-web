@@ -11,7 +11,7 @@ export default function TermsPage() {
 
         <div className="prose prose-lg max-w-none dark:prose-invert bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
           <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm">
-            <strong>Last Updated:</strong> March 2026
+            <strong>Last Updated:</strong> April 2026
           </p>
 
           <section className="mb-10">
