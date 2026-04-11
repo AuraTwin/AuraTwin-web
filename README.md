@@ -18,7 +18,7 @@ Website repository for the COMP4920 graduation project at **Yaşar University, C
 - **Framer Motion** — Animations
 - **Firebase Auth** — User authentication
 - **Cloud Firestore** — Emotion log & profile storage
-- **Gemini 2.0 Flash** — AI Digital Twin report generation
+- **Gemini 3.1 Lite** — AI Digital Twin report generation
 - **recharts** — Dashboard charts
 - **Netlify** — Deployment
 
