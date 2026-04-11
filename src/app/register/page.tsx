@@ -158,12 +158,12 @@ export default function RegisterPage() {
             </div>
 
             {/* Terms checkbox */}
-            <div className="flex items-start gap-2">
+            <div className="flex items-center gap-2">
               <input
                 id="terms"
                 type="checkbox"
                 required
-                className="mt-1 w-4 h-4 accent-primary-600 flex-shrink-0"
+                className="w-4 h-4 accent-primary-600 flex-shrink-0"
               />
               <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
                 I agree to the{' '}
