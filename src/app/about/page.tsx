@@ -45,7 +45,7 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {[
-              { name: 'Ali Haktan Sığın', role: 'Leader & Full Stack Developer', description: 'Led the project and developed the web platform, Firebase backend, and supported the desktop client.' },
+              { name: 'Ali Haktan Sığın', role: 'Lead & Full Stack Developer', description: 'Led the project and developed the web platform, Firebase backend, and supported the desktop client.' },
               { name: 'Ahmet Özgür Korkmaz', role: 'Cloud Infrastructure Engineer', description: 'Managed AWS virtual server setup and deployment of the backend Python application.' },
               { name: 'Utku Derici', role: 'Desktop Client Developer', description: 'Developed and tested the desktop client application and handled integration.' },
               { name: 'Yiğit Emre Çay', role: 'QA Engineer & Support', description: 'Conducted comprehensive system testing, helped documentation and development.' },
