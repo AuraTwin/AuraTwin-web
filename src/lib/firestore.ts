@@ -49,7 +49,7 @@ export async function updateUserProfile(uid: string, data: Partial<UserProfile>)
   await setDoc(docRef, data, { merge: true });
 }
 
-export async function getEmotionLogs(uid: string, days = 14): Promise<EmotionLog[]> {
+export async function getEmotionLogs(uid: string, days = 28): Promise<EmotionLog[]> {
   const since = new Date();
   since.setDate(since.getDate() - days);
 
