@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
@@ -16,10 +16,12 @@ import {
   WellbeingReport,
 } from '@/lib/firestore';
 import { generateWellbeingReport } from '@/lib/gemini';
+import { calculateWellbeing, TrendDirection } from '@/lib/wellbeing';
+import DigitalTwinFace from '@/components/DigitalTwinFace';
 import {
   PieChart, Pie, Cell,
   LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer,
+  Tooltip, Legend, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 
 const EMOTION_COLORS: Record<string, string> = {
@@ -71,9 +73,9 @@ function buildLineData(logs: EmotionLog[]) {
 
 function buildCalendarData(logs: EmotionLog[]) {
   const today = new Date();
-  return Array.from({ length: 14 }, (_, i) => {
+  return Array.from({ length: 28 }, (_, i) => {
     const d = new Date(today);
-    d.setDate(d.getDate() - (13 - i));
+    d.setDate(d.getDate() - (27 - i));
     const dayLogs = logs.filter((l) => {
       const ld = l.timestamp.toDate();
       return ld.getFullYear() === d.getFullYear() &&
@@ -197,7 +199,7 @@ export default function DashboardPage() {
     try {
       const [p, l, r] = await Promise.all([
         getUserProfile(uid),
-        getEmotionLogs(uid, 14),
+        getEmotionLogs(uid, 28),
         getAllReports(uid),
       ]);
       setProfile(p);
@@ -263,7 +265,7 @@ export default function DashboardPage() {
     setGeneratingReport(true);
     setReportError('');
     try {
-      const freshLogs = await getEmotionLogs(user.uid, 14);
+      const freshLogs = await getEmotionLogs(user.uid, 28);
       const content = await generateWellbeingReport(freshLogs);
       const id = await addReport(user.uid, content);
       const newReport: WellbeingReport = {
@@ -318,6 +320,17 @@ export default function DashboardPage() {
     setTimeout(() => { win.print(); win.close(); }, 350);
   };
 
+  // Wellbeing metrics — hooks must be called before any early return
+  const wellbeing = useMemo(() => calculateWellbeing(logs), [logs]);
+  const wellbeingChartData = useMemo(
+    () =>
+      wellbeing.dailyTrend.map((d) => ({
+        date: new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        score: d.score,
+      })),
+    [wellbeing.dailyTrend],
+  );
+
   if (loading || dataLoading) return <SkeletonDashboard />;
   if (!user) return null;
 
@@ -353,6 +366,29 @@ export default function DashboardPage() {
   const calendarData = buildCalendarData(logs);
   const lineEmotions = Array.from(new Set(logs.map((l) => l.emotion_label)));
   const displayedLogs = showAllLogs ? [...logs].reverse() : [...logs].reverse().slice(0, 10);
+
+  const scoreColor = (s: number) =>
+    s > 70
+      ? { text: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/40' }
+      : s >= 40
+        ? { text: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40' }
+        : { text: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/40' };
+
+  const trendBadge = (dir: TrendDirection) => {
+    switch (dir) {
+      case 'improving':
+        return { label: 'Improving', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' };
+      case 'declining':
+        return { label: 'Declining', cls: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400' };
+      default:
+        return { label: 'Stable', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400' };
+    }
+  };
+
+  const riskBarColor = (v: number) => (v < 30 ? '#22c55e' : v < 60 ? '#f59e0b' : '#ef4444');
+
+  const sc = scoreColor(wellbeing.wellbeingScore);
+  const tb = trendBadge(wellbeing.trendDirection);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -494,7 +530,7 @@ export default function DashboardPage() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Sessions</p>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalSessions || '--'}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Last 14 days</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Last 28 days</p>
           </div>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Most Common Emotion</p>
@@ -509,8 +545,122 @@ export default function DashboardPage() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Days Tracked</p>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">{daysTracked || '--'}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Unique days, last 14</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Unique days, last 28</p>
           </div>
+        </div>
+
+        {/* Wellbeing Score + Burnout Risk */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Wellbeing Score Card */}
+          <div className={`p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 min-h-[180px] ${sc.bg}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Wellbeing Score</h2>
+              <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${tb.cls}`}>
+                {tb.label}
+              </span>
+            </div>
+            {logs.length > 0 ? (
+              <div className="flex items-center gap-5">
+                <div className="shrink-0">
+                  <DigitalTwinFace wellbeingScore={wellbeing.wellbeingScore} size={100} />
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="flex items-baseline gap-1">
+                    <span className={`text-5xl font-extrabold tracking-tight ${sc.text}`}>
+                      {wellbeing.wellbeingScore}
+                    </span>
+                    <span className="text-lg text-gray-400 dark:text-gray-500 font-medium">/100</span>
+                  </div>
+                  <p className={`text-sm font-semibold mt-1 ${sc.text}`}>
+                    {wellbeing.wellbeingScore > 70
+                      ? 'Feeling Good'
+                      : wellbeing.wellbeingScore >= 40
+                        ? 'Take Care'
+                        : 'Rest Needed'}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Russell Valence-Arousal &middot; 28 days
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-5">
+                <div className="shrink-0">
+                  <DigitalTwinFace wellbeingScore={50} size={100} />
+                </div>
+                <div className="flex flex-col items-start text-gray-400 dark:text-gray-500">
+                  <p className="font-medium text-gray-600 dark:text-gray-400">No data yet</p>
+                  <p className="text-sm mt-1">Start tracking to see your wellbeing score.</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Burnout Risk Card */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-5">Burnout Risk</h2>
+            {logs.length > 0 ? (
+              <div className="space-y-4">
+                {([
+                  ['Emotional Exhaustion', wellbeing.burnoutRisk.emotionalExhaustion] as const,
+                  ['Accomplishment Loss', wellbeing.burnoutRisk.personalAccomplishmentLoss] as const,
+                  ['Overall Risk', wellbeing.burnoutRisk.overall] as const,
+                ]).map(([label, value]) => (
+                  <div key={label}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{value}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                      <div
+                        className="h-2.5 rounded-full transition-all duration-500"
+                        style={{ width: `${value}%`, backgroundColor: riskBarColor(value) }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-4 text-gray-400 dark:text-gray-500 text-center">
+                <p className="font-medium text-gray-600 dark:text-gray-400">No data yet</p>
+                <p className="text-sm mt-1">Burnout risk analysis requires emotion data.</p>
+              </div>
+            )}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+              Maslach-inspired &middot; Last 28 days
+            </p>
+          </div>
+        </div>
+
+        {/* 28-Day Wellbeing Trend */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Wellbeing Trend</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Daily wellbeing score — last 28 days</p>
+          {wellbeingChartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={wellbeingChartData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v: number) => [`${v}`, 'Score']} />
+                <ReferenceLine y={70} stroke="#22c55e" strokeDasharray="4 4" label={{ value: '70', position: 'right', fontSize: 10, fill: '#22c55e' }} />
+                <ReferenceLine y={40} stroke="#ef4444" strokeDasharray="4 4" label={{ value: '40', position: 'right', fontSize: 10, fill: '#ef4444' }} />
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#0ea5e9"
+                  strokeWidth={2.5}
+                  dot={{ r: 3, fill: '#0ea5e9' }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[280px] flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center px-4">
+              <p className="font-medium text-gray-600 dark:text-gray-400">No trend data yet</p>
+              <p className="text-sm mt-2">Wellbeing trends will appear after you start tracking.</p>
+            </div>
+          )}
         </div>
 
         {/* Charts — Emotion Distribution + Trend */}
@@ -575,10 +725,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 14-Day Emotion Calendar */}
+        {/* 28-Day Emotion Calendar */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Emotion Calendar</h2>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Dominant emotion per day — last 14 days</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Dominant emotion per day — last 28 days</p>
           <div className="grid grid-cols-7 gap-2">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
               <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 pb-1">
@@ -642,7 +792,7 @@ export default function DashboardPage() {
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Sessions</h2>
             {logs.length > 0 && (
-              <span className="text-xs text-gray-400 dark:text-gray-500">{logs.length} total in last 14 days</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">{logs.length} total in last 28 days</span>
             )}
           </div>
 
