@@ -39,7 +39,7 @@ users/{uid}/emotions/{autoId} → { timestamp, emotion_label, confidence }
 |------|------|
 | `src/lib/firebase.ts` | Firebase init (guards double-init) |
 | `src/lib/firestore.ts` | `getUserProfile`, `getEmotionLogs`, `saveReport`, `getLastReport` |
-| `src/lib/gemini.ts` | Calls Gemini 2.0 Flash to generate well-being reports |
+| `src/lib/gemini.ts` | Calls Gemini 3.1 Flash Lite to generate well-being reports |
 | `src/context/AuthContext.tsx` | `useAuth()` → `{ user, loading, logout }` |
 | `src/context/ThemeContext.tsx` | Dark/light mode, persisted to localStorage |
 

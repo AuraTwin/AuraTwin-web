@@ -374,7 +374,7 @@ export default function SciencePage() {
               <div className="space-y-3">
                 {[
                   {
-                    label: 'Powered by Gemini 3.1 Lite',
+                    label: 'Powered by Gemini 3.1 Flash Lite',
                     desc: "Google's fast multimodal model interprets your data and writes the report.",
                   },
                   {
