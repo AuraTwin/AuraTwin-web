@@ -5,9 +5,10 @@ import { useId } from 'react';
 interface DigitalTwinFaceProps {
   wellbeingScore: number;
   size?: number;
+  className?: string;
 }
 
-export default function DigitalTwinFace({ wellbeingScore, size = 100 }: DigitalTwinFaceProps) {
+export default function DigitalTwinFace({ wellbeingScore, size, className }: DigitalTwinFaceProps) {
   const s = Math.max(0, Math.min(100, wellbeingScore));
   const id = useId().replace(/:/g, '');
 
@@ -79,10 +80,12 @@ export default function DigitalTwinFace({ wellbeingScore, size = 100 }: DigitalT
   const wrapperAnim =
     s < 20 ? 'animate-wobble' : s >= 60 ? 'animate-bounce-soft' : 'animate-breathe';
 
+  const isFill = size === undefined;
+
   return (
     <div
-      className="relative inline-flex items-center justify-center transition-all duration-500"
-      style={{ width: size, height: size }}
+      className={`relative inline-flex items-center justify-center transition-all duration-500${className ? ` ${className}` : ''}`}
+      style={!isFill ? { width: size, height: size } : undefined}
     >
       {/* Background glow */}
       <div
@@ -94,8 +97,8 @@ export default function DigitalTwinFace({ wellbeingScore, size = 100 }: DigitalT
       />
 
       <svg
-        width={size}
-        height={size}
+        width={isFill ? '100%' : size}
+        height={isFill ? '100%' : size}
         viewBox="0 0 100 120"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -187,37 +190,19 @@ export default function DigitalTwinFace({ wellbeingScore, size = 100 }: DigitalT
         <ellipse cx="46" cy="30" rx="22" ry="12" fill="white" opacity="0.18" />
 
         {/* ── Hair ────────────────────────────────────────────────────────── */}
-        {/* Main hair volume */}
+        {/* Clean hair cap — outer arc over head, inner arc is the hairline */}
         <path
-          d="M 14 40 Q 14 8 50 6 Q 86 8 86 40 L 84 36 Q 82 18 50 14 Q 18 18 16 36 Z"
+          d="M 12 46 Q 14 10 50 8 Q 86 10 88 46 Q 82 24 64 22 Q 56 18 50 18 Q 44 18 36 22 Q 18 24 12 46 Z"
           fill={`url(#${id}-hair)`}
         />
-        {/* Side hair (left) */}
+        {/* Hair shine */}
         <path
-          d="M 14 40 Q 12 32 16 24 Q 14 34 18 42"
-          fill={hair.base}
-          opacity="0.6"
-        />
-        {/* Side hair (right) */}
-        <path
-          d="M 86 40 Q 88 32 84 24 Q 86 34 82 42"
-          fill={hair.base}
-          opacity="0.6"
-        />
-        {/* Wavy fringe detail */}
-        <path
-          d="M 22 22 Q 30 16 38 20 Q 44 14 52 18 Q 58 12 66 18 Q 72 14 78 22"
-          fill={hair.dark}
-          opacity="0.3"
-        />
-        {/* Hair highlight streak */}
-        <path
-          d="M 34 12 Q 40 10 46 14"
+          d="M 33 13 Q 42 10 50 12"
           stroke={hair.light}
-          strokeWidth="1.5"
+          strokeWidth="2"
           strokeLinecap="round"
           fill="none"
-          opacity="0.5"
+          opacity="0.4"
         />
 
         {/* ── Eyebrows ────────────────────────────────────────────────────── */}

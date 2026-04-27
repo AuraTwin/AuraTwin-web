@@ -555,7 +555,7 @@ export default function DashboardPage() {
         {/* Wellbeing Score + Burnout Risk */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Wellbeing Score Card */}
-          <div className={`p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 min-h-[180px] ${sc.bg}`}>
+          <div className={`p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col min-h-[220px] ${sc.bg}`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Wellbeing Score</h2>
@@ -572,11 +572,11 @@ export default function DashboardPage() {
               </span>
             </div>
             {logs.length > 0 ? (
-              <div className="flex items-center gap-5">
-                <div className="shrink-0">
-                  <DigitalTwinFace wellbeingScore={wellbeing.wellbeingScore} size={100} />
+              <div className="flex flex-1 items-center gap-5 min-h-0">
+                <div className="flex-none aspect-[5/6]" style={{ width: 'clamp(90px, 38%, 160px)' }}>
+                  <DigitalTwinFace wellbeingScore={wellbeing.wellbeingScore} className="w-full h-full" />
                 </div>
-                <div className="flex flex-col items-start">
+                <div className="flex flex-col items-start flex-1 min-w-0">
                   <div className="flex items-baseline gap-1">
                     <span className={`text-5xl font-extrabold tracking-tight ${sc.text}`}>
                       {wellbeing.wellbeingScore}
@@ -596,9 +596,9 @@ export default function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-5">
-                <div className="shrink-0">
-                  <DigitalTwinFace wellbeingScore={50} size={100} />
+              <div className="flex flex-1 items-center gap-5 min-h-0">
+                <div className="flex-none aspect-[5/6]" style={{ width: 'clamp(90px, 38%, 160px)' }}>
+                  <DigitalTwinFace wellbeingScore={50} className="w-full h-full" />
                 </div>
                 <div className="flex flex-col items-start text-gray-400 dark:text-gray-500">
                   <p className="font-medium text-gray-600 dark:text-gray-400">No data yet</p>
