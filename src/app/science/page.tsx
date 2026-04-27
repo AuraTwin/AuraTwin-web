@@ -28,7 +28,7 @@ export default function SciencePage() {
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-900 dark:to-gray-900 pt-20 pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fadeIn">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-5">
             How It{' '}
             <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
@@ -44,7 +44,7 @@ export default function SciencePage() {
       {/* Step 1 — Emotion Detection */}
       <section className="py-20 bg-white dark:bg-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
+          <div className="mb-12" data-reveal>
             <span className="text-xs font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
               Step 1
             </span>
@@ -58,7 +58,7 @@ export default function SciencePage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Model card */}
-            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal>
               <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
                 The model: <code className="text-primary-600 dark:text-primary-400 font-mono text-sm">enet_b0_8_best_afew</code>
               </h3>
@@ -92,7 +92,7 @@ export default function SciencePage() {
             </div>
 
             {/* Dataset card */}
-            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal data-reveal-delay="100">
               <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
                 Training data: AffectNet
               </h3>
@@ -130,7 +130,7 @@ export default function SciencePage() {
       {/* Step 2 — Wellbeing Score */}
       <section className="py-20 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
+          <div className="mb-12" data-reveal>
             <span className="text-xs font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
               Step 2
             </span>
@@ -145,8 +145,7 @@ export default function SciencePage() {
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Left col */}
             <div className="space-y-5">
-              {/* Model explanation */}
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
                   Based on{' '}
                   <a
@@ -175,8 +174,7 @@ export default function SciencePage() {
                 </p>
               </div>
 
-              {/* Score ranges */}
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal data-reveal-delay="80">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Score Ranges</h3>
                 <div className="space-y-2.5">
                   {scoreRanges.map(({ range, label, dot }) => (
@@ -191,7 +189,7 @@ export default function SciencePage() {
             </div>
 
             {/* Right col — emotion table */}
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal data-reveal-delay="160">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Emotion Values</h3>
               <div className="flex items-center gap-4 mb-5 text-xs text-gray-400 dark:text-gray-500">
                 <span className="flex items-center gap-1.5">
@@ -235,7 +233,7 @@ export default function SciencePage() {
       {/* Step 3 — Burnout Risk */}
       <section className="py-20 bg-white dark:bg-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
+          <div className="mb-12" data-reveal>
             <span className="text-xs font-bold uppercase tracking-widest text-accent-600 dark:text-accent-400">
               Step 3
             </span>
@@ -254,23 +252,28 @@ export default function SciencePage() {
                 dot: 'bg-orange-500',
                 dotBg: 'bg-orange-100 dark:bg-orange-900/30',
                 text: 'The share of moments where Sad, Angry, or Fear was detected. The more often these appear, the higher the exhaustion score.',
+                delay: '0',
               },
               {
                 title: 'Accomplishment Loss',
                 dot: 'bg-red-500',
                 dotBg: 'bg-red-100 dark:bg-red-900/30',
-                text: "How rarely Happy appeared: 1 − Happy ratio. If you’re almost never detected as happy, this score rises.",
+                text: "How rarely Happy appeared: 1 − Happy ratio. If you're almost never detected as happy, this score rises.",
+                delay: '80',
               },
               {
                 title: 'Overall Risk',
                 dot: 'bg-accent-500',
                 dotBg: 'bg-accent-100 dark:bg-accent-900/30',
                 text: 'A weighted average of both. Emotional Exhaustion carries more weight — sustained stress is the strongest early sign of burnout.',
+                delay: '160',
               },
-            ].map(({ title, dot, dotBg, text }) => (
+            ].map(({ title, dot, dotBg, text, delay }) => (
               <div
                 key={title}
                 className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700"
+                data-reveal
+                data-reveal-delay={delay}
               >
                 <div className={`w-8 h-8 ${dotBg} rounded-lg flex items-center justify-center mb-4`}>
                   <div className={`w-3 h-3 rounded-full ${dot}`} />
@@ -282,8 +285,7 @@ export default function SciencePage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
-            {/* Source */}
-            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 Inspired by the{' '}
                 <a
@@ -300,8 +302,7 @@ export default function SciencePage() {
               </p>
             </div>
 
-            {/* Trend */}
-            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal data-reveal-delay="100">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Trend Direction</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 The 28-day window is split in two. Comparing the halves shows whether things are getting better or worse.
@@ -326,7 +327,7 @@ export default function SciencePage() {
       {/* Step 4 — Digital Twin & AI Reports */}
       <section className="py-20 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
+          <div className="mb-12" data-reveal>
             <span className="text-xs font-bold uppercase tracking-widest text-warm-600 dark:text-warm-400">
               Step 4
             </span>
@@ -339,19 +340,18 @@ export default function SciencePage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Face / Memoji */}
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3">The Face</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 Your dashboard shows an animated avatar whose expression reflects your current wellbeing score. It updates in real time as new emotion data comes in — a quick visual signal that doesn&apos;t require reading numbers.
               </p>
               <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 space-y-2 text-sm">
                 {[
-                  { range: '80–100', label: 'Very Happy',  dot: 'bg-green-500' },
-                  { range: '60–79',  label: 'Happy',       dot: 'bg-emerald-500' },
-                  { range: '40–59',  label: 'Neutral',     dot: 'bg-yellow-500' },
-                  { range: '20–39',  label: 'Sad',         dot: 'bg-orange-500' },
-                  { range: '0–19',   label: 'Exhausted',   dot: 'bg-red-500' },
+                  { range: '80–100', label: 'Very Happy', dot: 'bg-green-500' },
+                  { range: '60–79',  label: 'Happy',      dot: 'bg-emerald-500' },
+                  { range: '40–59',  label: 'Neutral',    dot: 'bg-yellow-500' },
+                  { range: '20–39',  label: 'Sad',        dot: 'bg-orange-500' },
+                  { range: '0–19',   label: 'Exhausted',  dot: 'bg-red-500' },
                 ].map(({ range, label, dot }) => (
                   <div key={range} className="flex items-center gap-3">
                     <div className={`w-2 h-2 rounded-full flex-none ${dot}`} />
@@ -365,8 +365,7 @@ export default function SciencePage() {
               </p>
             </div>
 
-            {/* AI Reports */}
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700" data-reveal data-reveal-delay="100">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3">AI-Powered Reports</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 On demand, AuraTwin generates a written report summarising your emotional patterns. It reads your emotion history and produces a plain-language analysis — what you&apos;ve been feeling, how it&apos;s changed, and what to watch.
@@ -403,14 +402,14 @@ export default function SciencePage() {
       {/* Transparency */}
       <section className="py-20 bg-white dark:bg-gray-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
+          <div className="text-center mb-10" data-reveal>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
               What AuraTwin Is — and Isn&apos;t
             </h2>
             <p className="text-gray-600 dark:text-gray-300">Honest about what it can and can&apos;t do.</p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-6">
+          <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-100 dark:border-gray-700 space-y-6" data-reveal data-reveal-delay="80">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">It is</p>
               <ul className="space-y-2">
@@ -450,7 +449,7 @@ export default function SciencePage() {
 
       {/* CTA */}
       <section className="py-20 bg-gradient-to-br from-primary-600 to-accent-600 text-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
           <h2 className="text-4xl font-bold mb-4">See it for yourself</h2>
           <p className="text-xl text-primary-100 mb-8">Create an account and start tracking your emotional patterns.</p>
           <a
