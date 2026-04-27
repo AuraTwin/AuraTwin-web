@@ -1,4 +1,5 @@
 import { EmotionLog } from './firestore';
+import { calculateWellbeing, computeWeeklyTrend, WellbeingMetrics } from './wellbeing';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -134,14 +135,14 @@ function aggregateByDay(logs: EmotionLog[]): DailySummary[] {
 
 // ─── Prompt ───────────────────────────────────────────────────────────────────
 
-function buildPrompt(summaries: DailySummary[]): string {
+function buildPrompt(summaries: DailySummary[], wellbeing: WellbeingMetrics): string {
   const totalDays = summaries.length;
   const dateRange =
     totalDays > 0 ? `${summaries[0].date} to ${summaries[totalDays - 1].date}` : 'no data';
 
   const formattedJson = JSON.stringify(summaries, null, 2);
 
-  return `You are the 'AuraTwin Advisor,' a sophisticated Affective Computing agent and a supportive Digital Twin. Your goal is to analyze the user's emotional data from the last 14 days and provide a deeply personalized, empathetic, and proactive "Emotional Well-being Report." You do not judge; you observe, reflect, and guide.
+  return `You are the 'AuraTwin Advisor,' a sophisticated Affective Computing agent and a supportive Digital Twin. Your goal is to analyze the user's emotional data from the last 28 days and provide a deeply personalized, empathetic, and proactive "Emotional Well-being Report." You do not judge; you observe, reflect, and guide.
 
 ## Input Data
 
@@ -160,6 +161,24 @@ The \`anomalies\` array lists emotions detected with confidence > 0.80, tagged b
 
 \`\`\`json
 ${formattedJson}
+\`\`\`
+
+## Computed Wellbeing Metrics
+
+The following scores are derived from the emotion data above using the Russell Valence-Arousal model (wellbeing) and Maslach burnout dimensions. Incorporate them naturally into your report — do not create a separate section for them.
+
+- **Wellbeing Score** (0–100): higher is better. >70 = good, 40–70 = moderate, <40 = low.
+- **Burnout Risk**: Emotional Exhaustion (ratio of Sad+Angry+Fear) and Personal Accomplishment Loss (1 − Happy ratio). Overall is the weighted average.
+- **Weekly Trend**: average wellbeing per week (week 1 = oldest).
+- **Trend Direction**: whether wellbeing is improving, stable, or declining over the period.
+
+\`\`\`json
+${JSON.stringify({
+    wellbeingScore: wellbeing.wellbeingScore,
+    burnoutRisk: wellbeing.burnoutRisk,
+    weeklyTrend: computeWeeklyTrend(wellbeing.dailyTrend),
+    trendDirection: wellbeing.trendDirection,
+  }, null, 2)}
 \`\`\`
 
 ## Analysis Guidelines
@@ -211,7 +230,8 @@ export async function generateWellbeingReport(emotionLogs: EmotionLog[]): Promis
   }
 
   const summaries = aggregateByDay(emotionLogs);
-  const prompt = buildPrompt(summaries);
+  const wellbeing = calculateWellbeing(emotionLogs);
+  const prompt = buildPrompt(summaries, wellbeing);
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`,
