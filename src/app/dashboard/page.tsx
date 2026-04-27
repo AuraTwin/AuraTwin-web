@@ -18,6 +18,7 @@ import {
 import { generateWellbeingReport } from '@/lib/gemini';
 import { calculateWellbeing, TrendDirection } from '@/lib/wellbeing';
 import DigitalTwinFace from '@/components/DigitalTwinFace';
+import InfoModal from '@/components/InfoModal';
 import {
   PieChart, Pie, Cell,
   LineChart, Line, XAxis, YAxis, CartesianGrid,
@@ -189,6 +190,7 @@ export default function DashboardPage() {
   const [randomizing, setRandomizing] = useState(false);
   const [showRotateModal, setShowRotateModal] = useState(false);
   const [reportStaleWarning, setReportStaleWarning] = useState(false);
+  const [infoModal, setInfoModal] = useState<'wellbeing' | 'burnout' | null>(null);
   const [showTldr, setShowTldr] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [showAllLogs, setShowAllLogs] = useState(false);
@@ -391,6 +393,7 @@ export default function DashboardPage() {
   const tb = trendBadge(wellbeing.trendDirection);
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
 
       {/* App Key Rotate Modal */}
@@ -554,7 +557,16 @@ export default function DashboardPage() {
           {/* Wellbeing Score Card */}
           <div className={`p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 min-h-[180px] ${sc.bg}`}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Wellbeing Score</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Wellbeing Score</h2>
+                <button
+                  onClick={() => setInfoModal('wellbeing')}
+                  className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-primary-200 hover:text-primary-700 dark:hover:bg-primary-900 dark:hover:text-primary-300 transition-colors text-xs font-bold leading-none flex items-center justify-center"
+                  aria-label="What is Wellbeing Score?"
+                >
+                  ?
+                </button>
+              </div>
               <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${tb.cls}`}>
                 {tb.label}
               </span>
@@ -598,7 +610,16 @@ export default function DashboardPage() {
 
           {/* Burnout Risk Card */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-5">Burnout Risk</h2>
+            <div className="flex items-center gap-2 mb-5">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Burnout Risk</h2>
+              <button
+                onClick={() => setInfoModal('burnout')}
+                className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-primary-200 hover:text-primary-700 dark:hover:bg-primary-900 dark:hover:text-primary-300 transition-colors text-xs font-bold leading-none flex items-center justify-center"
+                aria-label="What is Burnout Risk?"
+              >
+                ?
+              </button>
+            </div>
             {logs.length > 0 ? (
               <div className="space-y-4">
                 {([
@@ -642,7 +663,7 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => [`${v}`, 'Score']} />
+                <Tooltip formatter={(v: number | undefined) => [`${v ?? ''}`, 'Score']} />
                 <ReferenceLine y={70} stroke="#22c55e" strokeDasharray="4 4" label={{ value: '70', position: 'right', fontSize: 10, fill: '#22c55e' }} />
                 <ReferenceLine y={40} stroke="#ef4444" strokeDasharray="4 4" label={{ value: '40', position: 'right', fontSize: 10, fill: '#ef4444' }} />
                 <Line
@@ -1055,5 +1076,135 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+
+    {/* Info Modals */}
+    {/* Wellbeing Score Info Modal */}
+    {infoModal === 'wellbeing' && (
+      <InfoModal title="How is Wellbeing Score calculated?" onClose={() => setInfoModal(null)}>
+        <p>
+          Your <strong>Wellbeing Score</strong> is a number from 0 to 100 that shows how emotionally
+          well you&apos;re doing, based on the emotions detected over the last 28 days.
+        </p>
+
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white mb-2">Score ranges</p>
+          <div className="space-y-1">
+            {[
+              { range: '80 – 100', label: 'Very Happy', color: 'text-green-600 dark:text-green-400' },
+              { range: '60 – 79', label: 'Happy', color: 'text-emerald-600 dark:text-emerald-400' },
+              { range: '40 – 59', label: 'Neutral', color: 'text-yellow-600 dark:text-yellow-400' },
+              { range: '20 – 39', label: 'Sad', color: 'text-orange-600 dark:text-orange-400' },
+              { range: '0 – 19', label: 'Exhausted', color: 'text-red-600 dark:text-red-400' },
+            ].map(({ range, label, color }) => (
+              <div key={range} className="flex items-center gap-3">
+                <span className="text-xs font-mono w-16 text-gray-500 dark:text-gray-400">{range}</span>
+                <span className={`text-xs font-semibold ${color}`}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white mb-2">How it works</p>
+          <p>
+            Each detected emotion gets two hidden values: how <em>positive</em> it feels (valence)
+            and how <em>activating</em> it is (arousal). Calm positive emotions score the highest;
+            high-stress negative emotions score the lowest.
+          </p>
+          <p className="mt-2 font-mono text-xs bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+            Score = (positivity × 0.7 + calmness × 0.3) × 100
+          </p>
+        </div>
+
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white mb-2">Emotion values</p>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+            {[
+              { e: 'Happy', v: 'High positive, moderate energy' },
+              { e: 'Neutral', v: 'Mid positive, mid energy' },
+              { e: 'Surprise', v: 'Moderate positive, high energy' },
+              { e: 'Contempt', v: 'Low positive, low energy' },
+              { e: 'Disgust', v: 'Low positive, moderate energy' },
+              { e: 'Sad', v: 'Low positive, very low energy' },
+              { e: 'Angry', v: 'Low positive, high energy' },
+              { e: 'Fear', v: 'Low positive, very high energy' },
+            ].map(({ e, v }) => (
+              <div key={e}>
+                <span className="font-semibold text-gray-800 dark:text-gray-200">{e}</span>
+                <span className="text-gray-500 dark:text-gray-400"> — {v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          <a
+            href="https://en.wikipedia.org/wiki/Emotional_granularity"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-primary-500 transition-colors"
+          >
+            Based on Russell&apos;s Valence-Arousal Circumplex model of emotions.
+          </a>
+        </p>
+      </InfoModal>
+    )}
+
+    {/* Burnout Risk Info Modal */}
+    {infoModal === 'burnout' && (
+      <InfoModal title="How is Burnout Risk calculated?" onClose={() => setInfoModal(null)}>
+        <p>
+          <strong>Burnout Risk</strong> shows how likely you are to be heading toward burnout,
+          based on your emotion patterns over the last 28 days. It goes from 0% (no risk) to
+          100% (very high risk).
+        </p>
+
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white mb-1">Emotional Exhaustion</p>
+          <p>
+            Measures how often you felt drained or stressed — specifically the share of moments
+            when Sad, Angry, or Fear were detected. The more frequent these emotions, the higher
+            the exhaustion score.
+          </p>
+        </div>
+
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white mb-1">Accomplishment Loss</p>
+          <p>
+            Measures how little joy you&apos;re experiencing — it&apos;s simply how rarely
+            Happy was detected. If you&apos;re almost never feeling happy, this score rises.
+          </p>
+        </div>
+
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white mb-1">Overall Risk</p>
+          <p>
+            A weighted average of the two scores above. Emotional Exhaustion carries more weight
+            because sustained stress is the strongest early sign of burnout.
+          </p>
+        </div>
+
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white mb-2">Trend</p>
+          <div className="space-y-1 text-xs">
+            <div><span className="font-semibold text-green-600 dark:text-green-400">Improving</span> — your scores are getting better over time</div>
+            <div><span className="font-semibold text-yellow-600 dark:text-yellow-400">Stable</span> — not much change recently</div>
+            <div><span className="font-semibold text-red-600 dark:text-red-400">Declining</span> — scores are worsening, worth paying attention to</div>
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          <a
+            href="https://en.wikipedia.org/wiki/Maslach_Burnout_Inventory"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-primary-500 transition-colors"
+          >
+            Inspired by the Maslach Burnout Inventory, a widely used tool in workplace psychology.
+          </a>
+        </p>
+      </InfoModal>
+    )}
+    </>
   );
 }
