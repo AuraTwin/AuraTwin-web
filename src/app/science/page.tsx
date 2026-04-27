@@ -103,12 +103,22 @@ export default function SciencePage() {
                 8 Detected Emotions
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {['Happy', 'Neutral', 'Sad', 'Angry', 'Fear', 'Disgust', 'Surprise', 'Contempt'].map((e) => (
+                {[
+                  { label: 'Happy',    emoji: '😊' },
+                  { label: 'Neutral',  emoji: '😐' },
+                  { label: 'Sad',      emoji: '😢' },
+                  { label: 'Angry',    emoji: '😠' },
+                  { label: 'Fear',     emoji: '😨' },
+                  { label: 'Disgust',  emoji: '🤢' },
+                  { label: 'Surprise', emoji: '😮' },
+                  { label: 'Contempt', emoji: '😒' },
+                ].map(({ label, emoji }) => (
                   <div
-                    key={e}
-                    className="text-xs font-medium bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600"
+                    key={label}
+                    className="flex items-center gap-2 text-xs font-medium bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600"
                   >
-                    {e}
+                    <span>{emoji}</span>
+                    <span>{label}</span>
                   </div>
                 ))}
               </div>
