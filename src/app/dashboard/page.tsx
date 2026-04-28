@@ -1117,21 +1117,41 @@ export default function DashboardPage() {
         </div>
 
         <div>
-          <p className="font-semibold text-gray-900 dark:text-white mb-2">Emotion values</p>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+          <p className="font-semibold text-gray-900 dark:text-white mb-3">Emotion values</p>
+          <div className="flex items-center gap-4 mb-3 text-xs text-gray-400 dark:text-gray-500">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-1.5 rounded-full bg-primary-500" /> Valence
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-1.5 rounded-full bg-accent-500" /> Arousal
+            </span>
+          </div>
+          <div className="space-y-3">
             {[
-              { e: 'Happy', v: 'High positive, moderate energy' },
-              { e: 'Neutral', v: 'Mid positive, mid energy' },
-              { e: 'Surprise', v: 'Moderate positive, high energy' },
-              { e: 'Contempt', v: 'Low positive, low energy' },
-              { e: 'Disgust', v: 'Low positive, moderate energy' },
-              { e: 'Sad', v: 'Low positive, very low energy' },
-              { e: 'Angry', v: 'Low positive, high energy' },
-              { e: 'Fear', v: 'Low positive, very high energy' },
-            ].map(({ e, v }) => (
+              { e: 'Happy',    valence: 0.90, arousal: 0.70 },
+              { e: 'Neutral',  valence: 0.50, arousal: 0.50 },
+              { e: 'Surprise', valence: 0.60, arousal: 0.90 },
+              { e: 'Contempt', valence: 0.20, arousal: 0.40 },
+              { e: 'Disgust',  valence: 0.10, arousal: 0.60 },
+              { e: 'Sad',      valence: 0.10, arousal: 0.20 },
+              { e: 'Angry',    valence: 0.10, arousal: 0.80 },
+              { e: 'Fear',     valence: 0.15, arousal: 0.85 },
+            ].map(({ e, valence, arousal }) => (
               <div key={e}>
-                <span className="font-semibold text-gray-800 dark:text-gray-200">{e}</span>
-                <span className="text-gray-500 dark:text-gray-400"> — {v}</span>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">{e}</span>
+                  <span className="text-xs font-mono text-gray-400 dark:text-gray-500">
+                    {valence.toFixed(2)} / {arousal.toFixed(2)}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                    <div className="h-1.5 rounded-full bg-primary-500" style={{ width: `${valence * 100}%` }} />
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                    <div className="h-1.5 rounded-full bg-accent-500" style={{ width: `${arousal * 100}%` }} />
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -1154,38 +1174,59 @@ export default function DashboardPage() {
     {infoModal === 'burnout' && (
       <InfoModal title="How is Burnout Risk calculated?" onClose={() => setInfoModal(null)}>
         <p>
-          <strong>Burnout Risk</strong> shows how likely you are to be heading toward burnout,
+          <strong>Burnout Risk</strong> shows how likely you are heading toward burnout,
           based on your emotion patterns over the last 28 days. It goes from 0% (no risk) to
-          100% (very high risk).
+          100% (very high risk). It is made up of two components.
         </p>
 
-        <div>
-          <p className="font-semibold text-gray-900 dark:text-white mb-1">Emotional Exhaustion</p>
-          <p>
-            Measures how often you felt drained or stressed — specifically the share of moments
-            when Sad, Angry, or Fear were detected. The more frequent these emotions, the higher
-            the exhaustion score.
-          </p>
+        <div className="space-y-4">
+          {/* Emotional Exhaustion */}
+          <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-100 dark:border-orange-800/30">
+            <p className="font-semibold text-gray-900 dark:text-white mb-1">
+              1 — Emotional Exhaustion
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+              How often you felt stressed or drained — the share of detections where{' '}
+              <span className="font-medium text-orange-600 dark:text-orange-400">Sad</span>,{' '}
+              <span className="font-medium text-orange-600 dark:text-orange-400">Angry</span>, or{' '}
+              <span className="font-medium text-orange-600 dark:text-orange-400">Fear</span> appeared.
+            </p>
+            <p className="font-mono text-xs bg-white dark:bg-gray-800 rounded-lg p-3 text-gray-800 dark:text-gray-200">
+              Exhaustion = (Sad + Angry + Fear count) / total × 100
+            </p>
+          </div>
+
+          {/* Accomplishment Loss */}
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-100 dark:border-red-800/30">
+            <p className="font-semibold text-gray-900 dark:text-white mb-1">
+              2 — Accomplishment Loss
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+              How rarely joy appeared — the inverse of how often{' '}
+              <span className="font-medium text-emerald-600 dark:text-emerald-400">Happy</span> was detected.
+            </p>
+            <p className="font-mono text-xs bg-white dark:bg-gray-800 rounded-lg p-3 text-gray-800 dark:text-gray-200">
+              Accomplishment Loss = (1 − Happy count / total) × 100
+            </p>
+          </div>
+
+          {/* Overall */}
+          <div className="bg-accent-50 dark:bg-accent-900/20 rounded-xl p-4 border border-accent-100 dark:border-accent-800/30">
+            <p className="font-semibold text-gray-900 dark:text-white mb-1">
+              Overall Risk
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+              A weighted average of both. Exhaustion carries more weight because sustained stress is
+              the strongest early sign of burnout.
+            </p>
+            <p className="font-mono text-xs bg-white dark:bg-gray-800 rounded-lg p-3 text-gray-800 dark:text-gray-200">
+              Overall = Exhaustion × 0.6 + Accomplishment Loss × 0.4
+            </p>
+          </div>
         </div>
 
         <div>
-          <p className="font-semibold text-gray-900 dark:text-white mb-1">Accomplishment Loss</p>
-          <p>
-            Measures how little joy you&apos;re experiencing — it&apos;s simply how rarely
-            Happy was detected. If you&apos;re almost never feeling happy, this score rises.
-          </p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-gray-900 dark:text-white mb-1">Overall Risk</p>
-          <p>
-            A weighted average of the two scores above. Emotional Exhaustion carries more weight
-            because sustained stress is the strongest early sign of burnout.
-          </p>
-        </div>
-
-        <div>
-          <p className="font-semibold text-gray-900 dark:text-white mb-2">Trend</p>
+          <p className="font-semibold text-gray-900 dark:text-white mb-2">Trend Direction</p>
           <div className="space-y-1 text-xs">
             <div><span className="font-semibold text-green-600 dark:text-green-400">Improving</span> — your scores are getting better over time</div>
             <div><span className="font-semibold text-yellow-600 dark:text-yellow-400">Stable</span> — not much change recently</div>
