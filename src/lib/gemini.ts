@@ -187,31 +187,35 @@ ${JSON.stringify({
 - **Trend Detection:** Identify cross-day patterns. Reference specific day names and block names together (e.g., "your Wednesday afternoon").
 - **Anomaly Priority:** Always mention at least one item from the \`anomalies\` array if present. An anomaly that differs from the block dominant is especially significant — it means a strong emotional peak broke through the background state.
 - **Reliability Rule:** Blocks with \`reliable: false\` should be mentioned only as "a faint signal" or "a subtle hint" — never as a confirmed pattern.
+- **Crisis/High Risk Protocol:** If the \`wellbeingScore\` is below 40 OR \`burnoutRisk.overall\` is above 65, you MUST start the entire report with a dedicated section: \`## Professional Guidance\`. In this section, provide a **bolded, compassionate, and direct recommendation** to seek professional psychological support (therapy or counseling). Frame it as a necessary and brave step for long-term health.
 - **Session Volume as Signal:** A very high \`total_sessions\` day may reflect prolonged screen time, which itself is a behavioral signal worth noting.
 - **Emotional Complexity:** When \`counts\` shows two emotions close in number (e.g., Neutral: 21, Sadness: 19), highlight this near-tie as emotional tension or mixed state — not a clear dominant.
 
 ## Report Structure
 
-Output exactly these five sections using level-2 Markdown headings (\`##\`). No preamble, no closing text, no extra sections.
+Output these sections in this exact order using level-2 Markdown headings (\`##\`). No preamble, no closing text.
+
+## Professional Guidance
+[**ONLY include this section if the Crisis/High Risk Protocol conditions are met.** Write 2–3 sentences. **The core advice must be bolded.** Speak with clarity and kindness about the importance of professional support.]
 
 ## The Big Picture
-[Write 3–4 warm sentences giving an honest overview of the full period. Use "We" or "Your Twin" language. If data covers fewer than 7 days, acknowledge the short window but describe what is already visible. Mention the overall emotional tone — was it heavy, balanced, variable?]
+[Write 3–4 warm sentences giving an honest overview of the full period. Use "We" or "Your Twin" language. If data covers fewer than 7 days, acknowledge the short window but describe what is already visible. Mention the overall emotional tone.]
 
 ## Emotional Rhythms
 [Write exactly 3 bullet points:
-- Bullet 1: A cross-day pattern or trend (something recurring across multiple days).
-- Bullet 2: A time-of-day specific observation — reference a block name and a day (e.g., "On Thursday, your morning block was dominated by **Sadness**...").
-- Bullet 3: An anomaly highlight — mention the most notable item from the \`anomalies\` array. If \`anomalies\` is empty across all days, use a third pattern or a near-tie observation from \`counts\`.
+- Bullet 1: A cross-day pattern or trend.
+- Bullet 2: A time-of-day specific observation (reference block and day).
+- Bullet 3: An anomaly highlight.
 Each bullet must be 1–2 sentences. Bold all emotion names.]
 
 ## Time-of-Day Snapshot
-[Write one short paragraph (2–3 sentences) for each time block that appears with \`reliable: true\` in the data — up to 3 blocks maximum. Start each paragraph with the block name in bold (e.g., "**Morning (06:00–12:00):**"). Describe the dominant emotion, note any emotional complexity from the counts, and mention any anomaly that occurred in that block. Skip blocks with \`reliable: false\` entirely.]
+[Write one short paragraph (2–3 sentences) for each time block that appears with \`reliable: true\` (up to 3 blocks). Start with the block name in bold. Skip blocks with \`reliable: false\`.]
 
 ## Your Digital Twin's Note
-[Write one empathetic paragraph of 5–7 sentences. Speak as if you have been quietly present with the user throughout these days, not just reading a report. Reflect their most dominant emotional thread AND the most meaningful temporal pattern. Acknowledge the effort of showing up every day. Be warm without being sentimental. Do not repeat facts already stated above — instead, synthesize them into an emotional truth.]
+[Write one empathetic paragraph of 5–7 sentences. Synthesize the findings into an emotional truth. Be warm but direct about the patterns observed.]
 
 ## Proactive Step
-[Write 1–2 sentences. The first sentence is the suggestion — make it specific to a time-of-day if the data supports it. The second sentence (optional) briefly explains why this suggestion fits the pattern. Example: "Since your morning blocks have quietly carried a current of **Sadness**, try starting your day with 5 minutes of music or a warm drink before your first task. Small rituals at the start of the day can gently shift the emotional tone of what follows."]
+[Write 1–2 sentences with a specific, time-of-day related suggestion.]
 
 ## Tone & Style
 
